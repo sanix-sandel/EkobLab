@@ -1,11 +1,27 @@
-<DOCTYPE html>
-    <html>
-        <title>About  </title>
-        <head>
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <h1>Afro-n-Tech</h1>
+        <p>Afro n tech is a 2019-created blog by Sandel Ikani, congolese (Congo Brazaville) student in oder to share
+            some useful informations about programming and tech, the blog is opened for everybody, anybody may register, and
+            might post. The name Afro n Tech because, many tech posts will insterest africans, some business and tech ideas with african reality. 
 
-        </head>
-        <body>
-            <p>As you know ....</p>
-        </body>
+        </p>
 
-    </html>
+        
+    </div>
+    <div class="content-section">
+        <h1>Sandel Ikani, Nixa sanix</h1>
+        <div class="media">
+            <img class="rounded-circle account-img" src="/static/profile_pics/sanix.png">
+            <div class="media-body">
+              <p class="text-secondary">Sanix Sanick, a congolese student </p>
+            </div>
+        </div>
+        
+
+        
+    </div>
+    
+
+{% endblock content %}

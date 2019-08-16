@@ -14,6 +14,7 @@ login_manager.login_message_category = 'info'
 mail = Mail()
 
 
+
 def create_app(config_class=Config):
     Myapp=Flask(__name__)
     Myapp.config.from_object(Config)
@@ -22,6 +23,7 @@ def create_app(config_class=Config):
     bcrypt.init_app(Myapp)
     login_manager.init_app(Myapp)
     mail.init_app(Myapp)
+
 
     from myapp.users.routes import users
     from myapp.posts.routes import posts
@@ -32,5 +34,5 @@ def create_app(config_class=Config):
     Myapp.register_blueprint(main)
     Myapp.register_blueprint(errors)
 
-
+    #print(Myapp.config)
     return Myapp
