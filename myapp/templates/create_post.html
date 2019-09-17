@@ -31,10 +31,13 @@
                     {{ form.content(class="form-control form-control-lg") }}
                 {% endif %}
             </div>
+            
         </fieldset>
         <div class="form-group">
             {{ form.submit(class="btn btn-outline-info") }}
         </div>
     </form>
+    {{ckeditor.load()}}
+    
 </div>
 {% endblock content %}

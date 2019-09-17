@@ -1,5 +1,6 @@
 from myapp import create_app
 
+
 Myapp=create_app()
 
 

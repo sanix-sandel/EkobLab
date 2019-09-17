@@ -10,7 +10,7 @@
               <small class="text-muted">{{ post.author.location }}</small>
             </div>
             <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
-            <p class="article-content">{{ post.content }}</p>
+            <p class="article-content">{{ post.content[:120]|safe}} <a href="{{url_for('posts.post', post_id=post.id)}}">Read more...</a></p>
           </div>
         </article>
     {% endfor %}
@@ -25,4 +25,5 @@
         ...
       {% endif %}
     {% endfor %}
+  
 {% endblock content %}

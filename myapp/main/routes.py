@@ -15,3 +15,8 @@ def home():
 @main.route("/about")
 def about():
     return render_template('about.html', title='About')
+
+
+@main.route('/admin')
+def securityblock():
+    return render_template('errors/404.html'), 404

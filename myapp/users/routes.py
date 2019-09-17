@@ -16,7 +16,7 @@ def register():
     form=RegistrationForm()
     if form.validate_on_submit():#si il valide son enregistrement, ses donnnées sont envoyées à la DB
         hashed_password=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user=User(username=form.username.data, email=form.email.data, password=hashed_password)
+        user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=False)
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created you are now able to log in!', 'success')
@@ -32,7 +32,7 @@ def login():
     form=LoginForm()
     if form.validate_on_submit():
         user=User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):#si il resussi a se connecter
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
              #alors on active le remember me, et ensuite on le renvoie a la prochaine page get by request
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
@@ -41,6 +41,7 @@ def login():
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('login.html', title='Login', form=form)
+
 
 
 @users.route("/logout")
@@ -60,10 +61,10 @@ def account():
             current_user.image_file = picture_file
         current_user.username = form.username.data
         current_user.email = form.email.data
-        current_user.location=form.location.data  #Ici
+        current_user.location=form.location.data      #Ici
         db.session.commit()
         flash('Your account has been updated!', 'success')
-        return redirect(url_for('users.account'))
+        return redirect(url_for('main.home'))
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
@@ -75,6 +76,7 @@ def account():
 
     
 @users.route("/user/<string:username>")
+@login_required
 def user_posts(username):
     page=request.args.get('page', 1, type=int)
     user=User.query.filter_by(username=username).first_or_404()
@@ -93,7 +95,7 @@ def reset_request():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         send_reset_email(user)
-        flash('An email has #icibeen sent with instructions to reset your password.', 'info')
+        flash('An email has been sent with instructions to reset your password.', 'info')
         return redirect(url_for('users.login'))
     return render_template('reset_request.html', title='Reset Password', form=form)
   
