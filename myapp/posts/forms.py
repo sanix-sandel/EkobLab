@@ -9,3 +9,4 @@ class PostForm(FlaskForm):
     title=StringField('Title', validators=[DataRequired()])
     content=TextAreaField("What's in your mind ?", validators=[DataRequired()])
     submit=SubmitField('Post')
+

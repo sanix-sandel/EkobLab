@@ -23,6 +23,7 @@ class User(db.Model, UserMixin):
     posts=db.relationship('Post', backref='author', lazy=True)
     location=db.Column(db.String(30), nullable=True)  #ici
     comment=db.relationship('Comment', backref='author', lazy=True)
+    files=db.relationship('File', backref='uploader',lazy=True)
     aboutme=db.Column(db.Text, nullable=True)
     admin=db.Column(db.Boolean())
     interests=db.Column(db.Text, nullable=True)
@@ -54,8 +55,16 @@ class Post(db.Model):
     content=db.Column(db.UnicodeText, nullable=False) 
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     comment=db.relationship('Comment', backref='post_comments', lazy='dynamic')
+    _reads=db.Column(db.Integer, default=0)
+    reads=_reads
     
     extend_existing=True
+
+    def _set_read(self, reads):
+        self._reads=reads
+
+    _reads=property(_set_read)    
+
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
@@ -69,6 +78,19 @@ class Comment(db.Model):
     post_id=db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
 
 
+
+class File(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    title=db.Column(db.String(100), nullable=False)   
+    date_posted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    data=db.Column(db.LargeBinary, nullable=False) 
+    user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    description=db.Column(db.String(500), nullable=False)
+    
+    extend_existing=True
+
+    def __repr__(self):
+        return f"File('{self.title}', '{self.date_posted}')"    
 
 class MyAdminIndexView(AdminIndexView): #availability of admin home page //admin=Admin(Myapp, index_view=admin.MyAdminindexView())
     def is_accessible(self):
@@ -98,6 +120,12 @@ class CommentView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
 
+
+class FilesView(ModelView):
+    column_exclude_list = ('data',)
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin        
+
 class UserAdminView(ModelView):
     column_searchable_list=('username',)
     column_sortable_list = ('username', 'admin', 'email', 'location','aboutme',)
@@ -109,8 +137,12 @@ class UserAdminView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
 
+
+
 admin.add_view(PostView(Post, db.session, category='Post'))
 
 admin.add_view(UserAdminView(User, db.session))
 
 admin.add_view(CommentView(Comment, db.session))
+
+admin.add_view(FilesView(File, db.session))

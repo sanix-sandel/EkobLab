@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content%}
+
+<article class="media content-section">
+    <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + file.uploader.image_file) }}">
+    <div class="media-body">
+      <div class="article-metadata">
+        <a class="mr-2" >{{ file.uploader.username }}</a>
+        <small class="text-muted">{{ file.date_posted.strftime('%Y-%m-%d') }}</small>
+        <small class="text-muted">{{ file.uploader.location }}</small>
+        
+      </div>
+        <h2 class="article-title">{{ file.title | safe }}</h2>
+        <p class="article-content">{{ file.description | safe }}</p>
+    </div>
+  </article>
+  <a href="{{url_for('files.download', file_id=file_id)}}"><em>Download</em></a>
+
+{% endblock content %}

@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block content %}
+
+{% for file in files.items %}
+        <article class="media content-section">
+          <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + file.uploader.image_file) }}">
+          <div class="media-body">
+            <div class="article-metadata">
+             <a class="mr-2" >{{ file.uploader.username }}</a>
+              <small class="text-muted">{{ file.date_posted.strftime('%Y-%m-%d') }}</small>
+              <small class="text-muted">{{ file.uploader.location }}</small>
+            </div>
+            <h2><a class="article-title" href="{{ url_for('files.file', file_id=file.id) }}">{{ file.title }}</a></h2>
+            <p class="article-content">{{ file.description[:30]|safe}} <a href="{{url_for('files.file', file_id=file.id)}}">Read more...</a></p>
+          </div>
+        </article>
+    {% endfor %}
+    {% for page_num in files.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+      {% if page_num %}
+        {% if files.page == page_num %}
+          <a class="btn btn-info mb-4" href="{{ url_for('files.allfiles', page=page_num) }}">{{ page_num }}</a>
+        {% else %}
+          <a class="btn btn-outline-info mb-4" href="{{ url_for('files.allfiles', page=page_num) }}">{{ page_num }}</a>
+        {% endif %}
+      {% else %}
+        ...
+      {% endif %}
+    {% endfor %}
+
+{% endblock content %}

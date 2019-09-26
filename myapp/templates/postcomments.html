@@ -16,8 +16,8 @@
         </div>
       {% endif %}
     </div>
-    <h2 class="article-title">{{ post.title }}</h2>
-    <p class="article-content">{{ post.content }}</p>
+    <h2 class="article-title">{{ post.title | safe }}</h2>
+    <p class="article-content">{{ post.content | safe }}</p>
   </div>
 </article>
 
@@ -36,7 +36,7 @@
       
     </div>
     
-    <p class="article-content">{{ comment.content }}</p>
+    <p class="article-content">{{ comment.content | safe }}</p>
   </div>
 </article>
 {% endfor %}

@@ -20,3 +20,10 @@ def about():
 @main.route('/admin')
 def securityblock():
     return render_template('errors/404.html'), 404
+
+
+@main.route("/trends")
+def trend():
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.order_by(Post.reads.desc()).paginate(page=page, per_page=5)
+    return render_template('trending.html', posts=posts)

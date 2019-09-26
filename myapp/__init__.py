@@ -42,11 +42,13 @@ def create_app(config_class=Config):
     from myapp.main.routes import main
     from myapp.errors.handlers import errors
     from myapp.comments.routes import comments
+    from myapp.files.routes import files
     Myapp.register_blueprint(users)
     Myapp.register_blueprint(posts)
     Myapp.register_blueprint(main)
     Myapp.register_blueprint(errors)
     Myapp.register_blueprint(comments)
+    Myapp.register_blueprint(files)
 
     #print(Myapp.config)
     return Myapp
