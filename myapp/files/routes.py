@@ -26,7 +26,7 @@ def upload():
     
     if form.is_submitted():
         flash('Your file has been uploaded !', 'succes')
-        newFile=File(title=file.filename, data=file.read(), description=form.description.data, uploader=current_user)
+        newFile=File(title=file.filename, data=file.read(), description=form.description.data, uploader=current_user, downloaded=0)
         db.session.add(newFile)
         db.session.commit()    
     return render_template("fileupload.html", form=form)
@@ -45,4 +45,8 @@ def file(file_id):
 @files.route('/file/<int:file_id>/download', methods=['POST', 'GET'])
 def download(file_id):
     file_data=File.query.get_or_404(file_id)
-    return send_file(BytesIO(file_data.data), attachment_filename=file_data.title, as_attachment=True)    
+    file_data.downloads()
+    db.session.commit()
+    return send_file(BytesIO(file_data.data), attachment_filename=file_data.title, as_attachment=True) 
+     
+    

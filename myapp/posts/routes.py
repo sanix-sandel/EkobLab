@@ -16,7 +16,7 @@ posts=Blueprint('posts', __name__)
 def new_post():
     form=PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=(form.content.data), author=current_user, reads=0)
+        post = Post(title=form.title.data, content=(form.content.data), author=current_user, reads=0, nbcomments=0)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'succes')
@@ -36,6 +36,7 @@ def post(post_id):
     if form.is_submitted():
         comment=Comment(content=form.content.data, author=current_user, post_id=post_id )
         db.session.add(comment)
+        post.nbrcomments()
         db.session.commit()
         flash('Your comment has been added', 'success')
         return redirect (url_for('posts.post', post_id=post.id))

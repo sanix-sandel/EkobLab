@@ -63,6 +63,6 @@
   </form>
 
   
-    <a href="{{url_for('comments.get_comment', post_id=post.id)}}">Comments section</a>
+    <a href="{{url_for('comments.get_comment', post_id=post.id)}}">{{ post.nbcomments }} comments </a>
 {% endif %}  
 {% endblock %}

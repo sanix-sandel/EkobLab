@@ -26,7 +26,7 @@ class User(db.Model, UserMixin):
     files=db.relationship('File', backref='uploader',lazy=True)
     aboutme=db.Column(db.Text, nullable=True)
     admin=db.Column(db.Boolean())
-    interests=db.Column(db.Text, nullable=True)
+    
     
 
     def is_admin(self):
@@ -57,11 +57,15 @@ class Post(db.Model):
     comment=db.relationship('Comment', backref='post_comments', lazy='dynamic')
     _reads=db.Column(db.Integer, default=0)
     reads=_reads
-    
+    nbcomments=db.Column(db.Integer, default=0)
+
     extend_existing=True
 
     def _set_read(self, reads):
         self._reads=reads
+
+    def nbrcomments(self):
+        self.nbcomments+=1
 
     _reads=property(_set_read)    
 
@@ -86,8 +90,14 @@ class File(db.Model):
     data=db.Column(db.LargeBinary, nullable=False) 
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     description=db.Column(db.String(500), nullable=False)
-    
+    cover=db.Column(db.String(20), nullable=False, default='default.jpg')
+    downloaded=db.Column(db.Integer, default=0)
+   
     extend_existing=True
+
+    def downloads(self):
+        self.downloaded+=1
+    
 
     def __repr__(self):
         return f"File('{self.title}', '{self.date_posted}')"    
@@ -131,7 +141,7 @@ class UserAdminView(ModelView):
     column_sortable_list = ('username', 'admin', 'email', 'location','aboutme',)
     column_exclude_list = ('password',)
     form_excluded_columns = ('password',)
-    form_edit_rules = ('username', 'admin', 'email', 'location', 'aboutme', 'interests',)
+    form_edit_rules = ('username', 'admin', 'email', 'location', 'aboutme',)
     form_create_rules=('username', 'email', 'admin', 'location', 'aboutme')
 
     def is_accessible(self):
