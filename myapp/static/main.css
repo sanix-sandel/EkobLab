@@ -1,18 +1,27 @@
 body {
   background: black;
-  color: #333333;
+  color:#333333;
   margin-top: 5rem;
-  font-family: 'Courier New', Courier, monospace
+  font-family: sans-serif;
+  font-size:13px;
+  font-weight: normal;
+  
 }
 
+.ecrits{
+  color:white;
+}
+
+
 h1, h2, h3, h4, h5, h6 {
-  color: #444444;
-  font-family: 'Courier New', Courier, monospace
+  color: black;
+  font-family: sans-serif;
 }
 
 .bg-steel {
-  background-color: black;
-  font-family: 'Times New Roman', Times, serif
+  background-color:#414141;
+  font-family: 'Times New Roman', Times, serif;
+  
 }
 
 .site-header .navbar-nav .nav-link {
@@ -36,8 +45,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
+
 .article-title {
-  color: #444444;
+  color:#444444;
 }
 
 a.article-title:hover {
@@ -47,6 +57,7 @@ a.article-title:hover {
 
 .article-content {
   white-space: pre-line;
+  color:black;
 }
 
 .article-img {
@@ -102,18 +113,65 @@ a.article-title:hover {
   display: inline-block;
   vertical-align: top;
 }
+/* search box */
 
+
+
+
+.searchbar{
+  margin-bottom: auto;
+  margin-top: auto;
+  height: 60px;
+  background-color: #00F9A9;/*#353b48*/;
+  border-radius: 30px;
+  padding: 10px;
+}
+
+.search_input{
+  color: black;
+  border: 0;
+  outline: 0;
+  background: none;
+  width: 0;
+  caret-color:transparent;
+  line-height: 40px;
+  transition: width 0.4s linear;
+}
+
+.searchbar:hover > .search_input{
+  padding: 0 10px;
+  width: 450px;
+  caret-color:#333333;
+  transition: width 0.4s linear;
+}
+
+.searchbar:hover > .search_icon{
+  background: white;
+  color: black;
+}
+
+.search_icon{
+  height: 40px;
+  width: 40px;
+  float: right;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  color:black;
+}
 
 /* footer left*/
 
 .footer .footer-left {
   width: 33%;
   padding-right: 15px;
+  color:#00F9A9;
 }
 
 .footer .about {
   line-height: 20px;
-  color: #ffffff;
+  color: #00F9A9;
   font-size: 13px;
   font-weight: normal;
   margin: 0;
@@ -121,7 +179,7 @@ a.article-title:hover {
 
 .footer .about span {
   display: block;
-  color: #ffffff;
+  color: #00F9A9;
   font-size: 14px;
   font-weight: bold;
   margin-bottom: 20px;
@@ -139,7 +197,7 @@ a.article-title:hover {
   background-color: #33383b;
   border-radius: 2px;
   font-size: 20px;
-  color: #ffffff;
+  color: #00F9A9;
   text-align: center;
   line-height: 35px;
   margin-right: 3px;
@@ -155,7 +213,7 @@ a.article-title:hover {
 
 .footer .footer-center i {
   background-color: #33383b;
-  color: #ffffff;
+  color: #00F9A9;
   font-size: 25px;
   width: 38px;
   height: 38px;
@@ -173,7 +231,7 @@ a.article-title:hover {
 
 .footer .footer-center p {
   display: inline-block;
-  color: #ffffff;
+  color: #00F9A9;
   vertical-align: middle;
   margin: 0;
 }
@@ -186,7 +244,7 @@ a.article-title:hover {
 }
 
 .footer .footer-center p a {
-  color: #0099ff;
+  color: #00F9A9;
   text-decoration: none;
 }
 
@@ -198,7 +256,7 @@ a.article-title:hover {
 }
 
 .footer h2 {
-  color: #ffffff;
+  color: #00F9A9;
   font-size: 36px;
   font-weight: normal;
   margin: 0;
@@ -209,7 +267,7 @@ a.article-title:hover {
 }
 
 .footer .menu {
-  color: #ffffff;
+  color: #00F9A9;
   margin: 20px 0 12px;
   padding: 0;
 }
@@ -222,5 +280,5 @@ a.article-title:hover {
 }
 
 .footer .menu a:hover {
-  color: #0099ff;
+  color: white;
 }

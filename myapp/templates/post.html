@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
+
+
   <article class="media content-section">
     <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
     <div class="media-body">
@@ -15,11 +17,11 @@
         {% endif %}
       </div>
         <h2 class="article-title">{{ post.title | safe }}</h2>
-        <p class="article-content">{{ post.content| safe }}</p>
+        <p class="article-content">{{ post.content | safe }}</p>
     </div>
-  </article>
+    
 
- 
+  </article>
   
   <!-- Modal -->
   <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -65,4 +67,23 @@
   
     <a href="{{url_for('comments.get_comment', post_id=post.id)}}">{{ post.nbcomments }} comments </a>
 {% endif %}  
+
+
+  <h2 class="ecrits">Related ... </h2>
+  
+  {% for pots in rposts %}
+    <article class="media content-section">
+      <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + pots.author.image_file) }}">
+      <div class="media-body">
+        <div class="article-metadata">
+          <a class="mr-2" href="{{ url_for('users.user_posts', username=pots.author.username) }}">{{ pots.author.username }}</a>
+          <small class="text-muted">{{ pots.date_posted.strftime('%Y-%m-%d') }}</small>
+          <small class="text-muted">{{ pots.author.location }}</small>
+        </div>
+        <h2><a class="article-title" href="{{ url_for('posts.post', post_id=pots.id) }}">{{ pots.title }}</a></h2>
+        <p class="article-content">{{ pots.content[:120]|safe}} <a href="{{url_for('posts.post', post_id=pots.id)}}">Read more...</a></p>
+      </div>
+    </article>
+{% endfor %}
+
 {% endblock %}

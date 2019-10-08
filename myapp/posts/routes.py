@@ -25,6 +25,7 @@ def new_post():
                            form=form, legend='New Post')
 
 
+
 @posts.route("/post/<int:post_id>", methods=['GET', 'POST'])
 @login_required
 def post(post_id):
@@ -33,6 +34,8 @@ def post(post_id):
     post.reads+=1
     db.session.commit()
     form=CommentForm()
+   
+    rposts=Post.query.filter_by(genre=post.genre).filter(id != post.id).limit(5).all()
     if form.is_submitted():
         comment=Comment(content=form.content.data, author=current_user, post_id=post_id )
         db.session.add(comment)
@@ -40,7 +43,7 @@ def post(post_id):
         db.session.commit()
         flash('Your comment has been added', 'success')
         return redirect (url_for('posts.post', post_id=post.id))
-    return render_template('post.html', title=post.title, post=post, form=form)
+    return render_template('post.html', title=post.title, post=post, form=form, rposts=rposts)
                           
                            
 

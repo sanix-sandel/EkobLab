@@ -12,7 +12,6 @@ from flask_script import Manager
 
 
 
-admin=Admin()
 db=SQLAlchemy()
 bcrypt=Bcrypt()
 login_manager = LoginManager()
@@ -21,7 +20,7 @@ login_manager.login_message_category = 'info'
 mail = Mail()
 ckeditor=CKEditor()
 migrate=Migrate()
-
+admin=Admin()
 
 
 def create_app(config_class=Config):

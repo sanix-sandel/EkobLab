@@ -54,7 +54,8 @@ class Post(db.Model):
     date_posted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     content=db.Column(db.UnicodeText, nullable=False) 
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    comment=db.relationship('Comment', backref='post_comments', lazy='dynamic')
+    genre=db.Column(db.String(20), nullable=False, default='chat')
+    comment=db.relationship('Comment', backref='post_comments', lazy='dynamic', cascade='all, delete-orphan')
     _reads=db.Column(db.Integer, default=0)
     reads=_reads
     nbcomments=db.Column(db.Integer, default=0)
@@ -90,7 +91,6 @@ class File(db.Model):
     data=db.Column(db.LargeBinary, nullable=False) 
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     description=db.Column(db.String(500), nullable=False)
-    cover=db.Column(db.String(20), nullable=False, default='default.jpg')
     downloaded=db.Column(db.Integer, default=0)
    
     extend_existing=True

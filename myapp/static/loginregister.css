@@ -2,8 +2,10 @@ body {
 
     color: #333333;
     margin-top: 5rem;
-    background: url("BZ.jpg") no-repeat;
-    font-family: 'Courier New', Courier, monospace
+    background: url("BrazzaCity.jpg") no-repeat;
+    font-family: sans-serif;
+    font-size:13px;
+    font-weight: normal;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -11,10 +13,12 @@ body {
     font-family: 'Courier New', Courier, monospace
   }
   
-  .bg-steel {
-    background-color: black;
-    font-family: 'Times New Roman', Times, serif
-  }
+  
+.bg-steel {
+  background-color:#414141;
+  font-family: 'Times New Roman', Times, serif
+}
+
   
   .site-header .navbar-nav .nav-link {
     color: #00F9A9;

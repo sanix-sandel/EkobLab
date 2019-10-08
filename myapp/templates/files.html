@@ -11,6 +11,7 @@
               <small class="text-muted">{{ file.uploader.location }}</small>
             </div>
             <h2><a class="article-title" href="{{ url_for('files.file', file_id=file.id) }}">{{ file.title }}</a></h2>
+            
             <p class="article-content">{{ file.description[:30]|safe}} <a href="{{url_for('files.file', file_id=file.id)}}">Read more...</a></p>
           </div>
         </article>

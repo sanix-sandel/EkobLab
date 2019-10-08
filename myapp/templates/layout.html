@@ -15,6 +15,14 @@
     {% else %}
         <em><title>TechyB</title></em>
     {% endif %}
+    <!-- For Search box -->
+    
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- for the icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  
 </head>
 
 
@@ -29,15 +37,26 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="{{ url_for('main.home') }}">Home</a>
+              <a class="nav-item nav-link" href="{{ url_for('main.home') }}"><i class="fa fa-home"></i></a>
               <a class="nav-item nav-link" href="{{ url_for('main.about') }}">About</a>
             </div>
+
+            <!-- Search panel -->
+            <div class="container h-100">
+              <div class="d-flex justify-content-center h-100">
+                <div class="searchbar">
+                  <input class="search_input" type="text" name="" placeholder="Search...">
+                  <a href="#" class="search_icon"><i class="fa fa-search"></i></a>
+                </div>
+              </div>
+            </div>
+            
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if current_user.is_authenticated %}
-                <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}">Launch*a*chat!</a>
-                <a class="nav-item nav-link" href="{{ url_for('users.account') }}">Account</a>
-                <a class="nav-item nav-link" href="{{ url_for('users.logout') }}">Logout</a>
+                <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}"><i class="fa fa-paper-plane-o"></i></a>
+                <a class="nav-item nav-link" href="{{ url_for('users.account') }}" ><i class="fa fa-user-circle"></i></a>
+                <a class="nav-item nav-link" href="{{ url_for('users.logout') }}"><i class="fa fa-power-off"></i></a>
               {% else %}
                 <a class="nav-item nav-link" href="{{ url_for('users.login') }}">Login</a>
                 <a class="nav-item nav-link" href="{{ url_for('users.register') }}">Register</a>
@@ -67,7 +86,7 @@
             <p class='text-muted'>You can put any information here you'd like.
               <ul class="list-group">
                 <li class="list-group-item list-group-item-light">
-                  <a href="{{url_for('main.trend')}}">Most trending Posts</a>
+                  <a href="{{url_for('main.trend')}}">Trending Posts</a>
                 </li>
                 <li class="list-group-item list-group-item-light">
                   <a href="{{url_for('files.upload')}}">Upload files</a>
@@ -80,6 +99,7 @@
             </p>
           </div>
         </div>
+       
       </div>
     </main>
 
@@ -91,7 +111,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
     <footer class="footer">
       <div class="footer-left col-md-4 col-sm-6">
         <p class="about">
@@ -104,12 +124,13 @@
           <a href="#"><i class="fa fa-linkedin"></i></a>
           <a href="#"><i class="fa fa-google-plus"></i></a>
           <a href="#"><i class="fa fa-instagram"></i></a>
+          <a href="#"><i class="fa fa-vk"></i></a>
         </div>
       </div>
       <div class="footer-center col-md-4 col-sm-6">
         <div>
           <i class="fa fa-map-marker"></i>
-          <p><span> Street name and number</span> City, Country</p>
+          <p><span> Street name and number</span> Brazzaville, Rep.Congo</p>
         </div>
         <div>
           <i class="fa fa-phone"></i>
@@ -130,11 +151,8 @@
           <a href="#"> News</a> |
           <a href="#"> Contact</a>
         </p>
-        <p class="name"> Company Name &copy; 2016</p>
+        <p class="name"> TechyB Inc. &copy; 2019</p>
       </div>
     </footer>  
-
-  
 </body>
- 
 </html>
