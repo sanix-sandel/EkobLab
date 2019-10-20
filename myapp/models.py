@@ -3,10 +3,12 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from myapp import db, login_manager, admin, bcrypt
 from flask import current_app, flash
 from flask_login import UserMixin, current_user
+from myapp import admin
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import AdminIndexView
 from flask_admin.form import rules
 from wtforms import widgets,TextAreaField, PasswordField
+
 
 
 @login_manager.user_loader
@@ -26,7 +28,8 @@ class User(db.Model, UserMixin):
     files=db.relationship('File', backref='uploader',lazy=True)
     aboutme=db.Column(db.Text, nullable=True)
     admin=db.Column(db.Boolean())
-    
+    confirmed=db.Column(db.Boolean, default=False)
+    liked=db.relationship('PostLike', backref='liker', lazy=True)
     
 
     def is_admin(self):
@@ -35,6 +38,40 @@ class User(db.Model, UserMixin):
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
         return s.dumps({'user_id': self.id}).decode('utf-8')
+
+
+    def generate_confirmation_token(self, expiration=3600):
+        s=Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'confirm':self.id}).decode('utf-8')
+
+
+    def confirm(self, token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token.encode('utf-8'))
+        except:
+            return False
+        if data.get('confirm') != self.id:
+            return False
+        self.confirmed = True
+        db.session.add(self)
+        return True
+
+    def has_liked_post(self, post):
+        return PostLike.query.filter(
+            PostLike.user_id == self.id,
+            PostLike.post_id == post.id).count() > 0
+
+    def like_post(self, post):
+        if not self.has_liked_post(post):
+            like = PostLike(user_id=self.id, post_id=post.id)
+            db.session.add(like)
+
+    def unlike_post(self, post):
+        if self.has_liked_post(post):
+            PostLike.query.filter_by(
+                user_id=self.id,
+                post_id=post.id).delete()
 
     @staticmethod
     def verify_reset_token(token):
@@ -59,17 +96,27 @@ class Post(db.Model):
     _reads=db.Column(db.Integer, default=0)
     reads=_reads
     nbcomments=db.Column(db.Integer, default=0)
+    liked=db.relationship('PostLike', backref='post_liked', lazy='dynamic', cascade='all, delete-orphan')
+    nbrlikes=db.Column(db.Integer, default=0)
 
+
+   
     extend_existing=True
 
     def _set_read(self, reads):
         self._reads=reads
 
+    def like(self):
+        self.nbrlikes+=1    
+
+    def dislike(self):
+        self.nbrlikes-=1     
+
     def nbrcomments(self):
         self.nbcomments+=1
 
     _reads=property(_set_read)    
-
+    
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
@@ -102,9 +149,14 @@ class File(db.Model):
     def __repr__(self):
         return f"File('{self.title}', '{self.date_posted}')"    
 
-class MyAdminIndexView(AdminIndexView): #availability of admin home page //admin=Admin(Myapp, index_view=admin.MyAdminindexView())
-    def is_accessible(self):
-        return current_user.is_authenticated and current_user.is_admin
+
+class PostLike(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    user_id=db.Column(db.Integer, db.ForeignKey('user.id'))
+    post_id=db.Column(db.Integer, db.ForeignKey('post.id'))
+
+
+
 
 class CKTextAreaWidget(widgets.TextArea):
     def __call__(self, field, **kwargs):
@@ -156,3 +208,4 @@ admin.add_view(UserAdminView(User, db.session))
 admin.add_view(CommentView(Comment, db.session))
 
 admin.add_view(FilesView(File, db.session))
+

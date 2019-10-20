@@ -15,6 +15,11 @@
     {% else %}
         <em><title>TechyB</title></em>
     {% endif %}
+    <!--For summernote -->
+  
+</head>
+
+
     <!-- For Search box -->
     
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
@@ -27,7 +32,8 @@
 
 
 <body>
-    {{ckeditor.load()}}
+   
+   {{ckeditor.load()}}
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
@@ -50,13 +56,26 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
+              
+
               {% if current_user.is_authenticated %}
+                <div class="dropdown">
+                  <i class="dropbtn" ><i class="fa fa-bars"></i></i>
+                  <div class="dropdown-content">
+                    <p><a href="{{url_for('main.trend')}}">Trending posts</a></p>
+                    <p><a href="{{url_for('files.upload')}}">Upload files</a></p>
+                    <a href="{{url_for('files.allfiles')}}">PDF</a>
+                    <a href="{{url_for('files.recommand')}}">Recommand a book</a>
+                  </div>
+                </div>
                 <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}"><i class="fa fa-paper-plane-o"></i></a>
                 <a class="nav-item nav-link" href="{{ url_for('users.account') }}" ><i class="fa fa-user-circle"></i></a>
                 <a class="nav-item nav-link" href="{{ url_for('users.logout') }}"><i class="fa fa-power-off"></i></a>
+
+                
               {% else %}
                 <a class="nav-item nav-link" href="{{ url_for('users.login') }}">Login</a>
                 <a class="nav-item nav-link" href="{{ url_for('users.register') }}">Register</a>
@@ -154,5 +173,7 @@
         <p class="name"> TechyB Inc. &copy; 2019</p>
       </div>
     </footer>  
+  
+  </script>
 </body>
 </html>

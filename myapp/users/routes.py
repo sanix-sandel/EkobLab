@@ -4,10 +4,13 @@ from myapp import db, bcrypt
 from myapp.models import User, Post
 from myapp.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm)
-from myapp.users.utils import save_picture, send_reset_email
+from myapp.users.utils import save_picture, send_reset_email, email_confirmation
+from myapp import mail
 
 
 users=Blueprint('users', __name__)
+
+
 
 @users.route('/register', methods=['GET', 'POST'])
 def register():
@@ -19,7 +22,9 @@ def register():
         user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=False)
         db.session.add(user)
         db.session.commit()
-        flash('Your account has been created you are now able to log in!', 'success')
+        token=user.generate_confirmation_token()
+        email_confirmation(user)
+        flash('A confirmation email has been sent to you by email !', 'success')
         return redirect(url_for('users.login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -116,3 +121,18 @@ def reset_token(token):
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('users.login'))
     return render_template('reset_token.html', title='Reset Password', form=form)        
+
+
+
+
+@users.route("/confirm/<token>")
+@login_required
+def confirm(token):
+    if current_user.confirmed:
+        return redirect(url_for('main.home'))
+    if current_user.confirm(token):
+        db.session.commit()
+        flash('You have confirmed your account, thank you !')
+    else:
+        flash('The confirmation link is invalid or has expired')
+    return redirect(url_for('main.home'))              

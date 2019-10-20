@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,3 +19,19 @@
 </body>
 </html>
 
+
+<div class="form-group">
+                
+        {{ form.content.label(class="form-control-label") }}
+        {% if form.content.errors %}
+            {{ form.content(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.content.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.content(class="form-control form-control-lg") }}
+        {% endif %}
+    
+    </div>

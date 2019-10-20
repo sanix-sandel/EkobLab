@@ -25,7 +25,6 @@ def new_post():
                            form=form, legend='New Post')
 
 
-
 @posts.route("/post/<int:post_id>", methods=['GET', 'POST'])
 @login_required
 def post(post_id):
@@ -44,8 +43,8 @@ def post(post_id):
         flash('Your comment has been added', 'success')
         return redirect (url_for('posts.post', post_id=post.id))
     return render_template('post.html', title=post.title, post=post, form=form, rposts=rposts)
-                          
-                           
+                                                  
+
 
 
 @posts.route("/post/<int:post_id>/delete", methods=['POST'])
@@ -80,3 +79,17 @@ def update_post(post_id):
                            form=form, legend='Update Post')
 
 
+
+@posts.route('/like/<int:post_id>/<action>')
+@login_required
+def like_action(post_id, action):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+    if action == 'like':
+        current_user.like_post(post)
+        post.like()
+        db.session.commit()
+    if action == 'unlike':
+        current_user.unlike_post(post)
+        post.dislike()
+        db.session.commit()
+    return redirect(request.referrer)

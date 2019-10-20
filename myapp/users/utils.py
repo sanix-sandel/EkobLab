@@ -31,3 +31,19 @@ def send_reset_email(user):
     If you did not make this request then simply ignore this email and no changes will be made.
     '''
     mail.send(msg)
+
+
+   
+
+def email_confirmation(user):
+    token = user.generate_confirmation_token()
+    msg = Message('Registration Confirmation',
+                  sender='techyintelo@gmail.com',
+                  recipients=[user.email])
+    msg.body = f'''To confirm your regsitration , visit the following link:
+    {url_for('users.confirm', token=token, _external=True)}
+    If you did not make this request then simply ignore this email and no changes will be made.
+    '''
+    mail.send(msg)
+
+
