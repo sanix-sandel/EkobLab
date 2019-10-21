@@ -65,10 +65,11 @@
                 <div class="dropdown">
                   <i class="dropbtn" ><i class="fa fa-bars"></i></i>
                   <div class="dropdown-content">
-                    <p><a href="{{url_for('main.trend')}}">Trending posts</a></p>
-                    <p><a href="{{url_for('files.upload')}}">Upload files</a></p>
-                    <a href="{{url_for('files.allfiles')}}">PDF</a>
-                    <a href="{{url_for('files.recommand')}}">Recommand a book</a>
+                    <a href="{{url_for('main.trend')}}">Trending posts</a>
+                    <a href="{{url_for('files.upload')}}">Upload files</a>
+                    <a href="{{url_for('files.allfiles')}}">Download Ebooks</a>
+                    <a href="{{url_for('files.recommend')}}">Recommend an ebook</a>
+                    <a href="{{url_for('files.ebooks')}}">Recommended ebooks</a>
                   </div>
                 </div>
                 <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}"><i class="fa fa-paper-plane-o"></i></a>

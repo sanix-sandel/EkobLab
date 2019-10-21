@@ -30,6 +30,7 @@ class User(db.Model, UserMixin):
     admin=db.Column(db.Boolean())
     confirmed=db.Column(db.Boolean, default=False)
     liked=db.relationship('PostLike', backref='liker', lazy=True)
+    recommendations=db.relationship('Ebook', backref='recommender', lazy=True)
     
 
     def is_admin(self):
@@ -87,7 +88,7 @@ class User(db.Model, UserMixin):
 
 class Post(db.Model):
     id=db.Column(db.Integer, primary_key=True)
-    title=db.Column(db.String(100), nullable=False)   
+    title=db.Column(db.String(50), nullable=False)   
     date_posted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     content=db.Column(db.UnicodeText, nullable=False) 
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -133,7 +134,7 @@ class Comment(db.Model):
 
 class File(db.Model):
     id=db.Column(db.Integer, primary_key=True)
-    title=db.Column(db.String(100), nullable=False)   
+    title=db.Column(db.String(40), nullable=False)   
     date_posted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     data=db.Column(db.LargeBinary, nullable=False) 
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -152,10 +153,16 @@ class File(db.Model):
 
 class PostLike(db.Model):
     id=db.Column(db.Integer, primary_key=True)
-    user_id=db.Column(db.Integer, db.ForeignKey('user.id'))
-    post_id=db.Column(db.Integer, db.ForeignKey('post.id'))
+    user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id=db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
 
 
+class Ebook(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date_posted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    title=db.Column(db.String(40), nullable=False)
+    author=db.Column(db.String(40), nullable=False)
 
 
 class CKTextAreaWidget(widgets.TextArea):
@@ -186,7 +193,13 @@ class CommentView(ModelView):
 class FilesView(ModelView):
     column_exclude_list = ('data',)
     def is_accessible(self):
-        return current_user.is_authenticated and current_user.is_admin        
+        return current_user.is_authenticated and current_user.is_admin   
+
+
+
+class EbookView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin                
 
 class UserAdminView(ModelView):
     column_searchable_list=('username',)
@@ -208,4 +221,7 @@ admin.add_view(UserAdminView(User, db.session))
 admin.add_view(CommentView(Comment, db.session))
 
 admin.add_view(FilesView(File, db.session))
+
+admin.add_view(EbookView(Ebook, db.session))
+
 

@@ -2,8 +2,8 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint, request, send_file)
 from flask_login import current_user, login_required
 from myapp import db
-from myapp.models import File
-from myapp.files.forms import FileForm, FileCommand
+from myapp.models import File, Ebook
+from myapp.files.forms import FileForm, EbookForm
 import bleach
 from io import BytesIO
 from flask import Markup
@@ -20,13 +20,15 @@ ALLOWED_EXTENSIONS=set(['pdf'])
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@login_required
 @files.route("/files", methods=['GET', 'POST'])
 def allfiles():
     page = request.args.get('page', 1, type=int)
     files = File.query.order_by(File.date_posted.desc()).paginate(page=page, per_page=5)
     return render_template('files.html', files=files)
 
-@files.route('/upload', methods=['GET', 'POST'])
+@login_required
+@files.route('/home/upload', methods=['GET', 'POST'])
 def upload():
     form=FileForm()
     if request.method=='POST':
@@ -69,20 +71,30 @@ def download(file_id):
      
 
 @login_required
-@files.route("/recommand", methods=['GET', 'POST'])
-def recommand():
-    form=FileCommand()
-    if form.is_submitted():
-        flash("Your recommandation is received, we'll reply soon", 'success')
-        msg = Message('E-Books Recommandation',
+@files.route("/home/recommend", methods=['GET', 'POST'])
+def recommend():
+    form=EbookForm()
+    if form.validate_on_submit():
+        flash("Your recommendation is received, we'll reply soon", 'success')
+        ebook=Ebook(title=form.title.data, author=form.author.data, recommender=current_user)
+        db.session.add(ebook)
+        db.session.commit()
+        msg = Message('E-Books Recommendation',
                   sender='techyintelo@gmail.com',
                   recipients=[current_user.email])
-        msg.body = f'''We received your command , Soon we'll send you by this mail a link i 
-        order to download the E-Book 
+        msg.body = f'''We received your E-Book recommendation , Soon we'll 
+        send you by this mail a link in order to download the E-Book. 
         If you did not make this request then simply ignore this email and no changes will be made.
         TechyB Team.
         '''
         mail.send(msg)
         return redirect(url_for('main.home'))  
-    return render_template('recommand.html', form=form)
-    
+    return render_template('recommend.html', form=form)
+
+
+@login_required
+@files.route('/home/ebooks', methods=['GET'])    
+def ebooks():
+    page = request.args.get('page', 1, type=int)
+    ebooks = Ebook.query.order_by(Ebook.date_posted.desc()).paginate(page=page, per_page=5)
+    return render_template('Ebooks.html', ebooks=ebooks)
