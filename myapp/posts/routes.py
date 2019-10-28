@@ -4,9 +4,10 @@ from flask_login import current_user, login_required
 from myapp import db
 from myapp.models import Post, Comment
 from myapp.posts.forms import PostForm
-from myapp.comments.forms import CommentForm
+from myapp.comments.forms import CommentForm, ReplyForm
 import bleach
 from flask import Markup
+from flask import send_from_directory
 
 posts=Blueprint('posts', __name__)
 
@@ -34,7 +35,7 @@ def post(post_id):
     db.session.commit()
     form=CommentForm()
    
-    rposts=Post.query.filter_by(genre=post.genre).filter(id != post.id).limit(5).all()
+    rposts=Post.query.filter(Post.id != post.id ).filter_by(genre=post.genre).limit(5).all()
     if form.is_submitted():
         comment=Comment(content=form.content.data, author=current_user, post_id=post_id )
         db.session.add(comment)
@@ -93,3 +94,4 @@ def like_action(post_id, action):
         post.dislike()
         db.session.commit()
     return redirect(request.referrer)
+

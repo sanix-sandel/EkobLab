@@ -11,14 +11,12 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}"></link>
 
     {% if title %}
-        <em><title>TechyB - {{ title }}</title></em>
+        <em><title>EkoB - {{ title }}</title></em>
     {% else %}
-        <em><title>TechyB</title></em>
+        <em><title>EkoB</title></em>
     {% endif %}
     <!--For summernote -->
   
-</head>
-
 
     <!-- For Search box -->
     
@@ -37,17 +35,18 @@
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="/"><b><em>TechyB</em></b></a>
+          <a class="navbar-brand mr-4" href="/"><b><em>EkoB</em></b></a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="{{ url_for('main.home') }}"><i class="fa fa-home"></i></a>
-              <a class="nav-item nav-link" href="{{ url_for('main.about') }}">About</a>
+              <a class="nav-item nav-link" href="{{ url_for('main.about') }}"><em> ? </em></a>
             </div>
-
+          {% if current_user.is_authenticated %}  
             <!-- Search panel -->
+            
             <div class="container h-100">
               <div class="d-flex justify-content-center h-100">
                 <div class="searchbar">
@@ -56,6 +55,7 @@
                 </div>
               </div>
             </div>
+          {% endif %}
 
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
@@ -78,8 +78,8 @@
 
                 
               {% else %}
-                <a class="nav-item nav-link" href="{{ url_for('users.login') }}">Login</a>
-                <a class="nav-item nav-link" href="{{ url_for('users.register') }}">Register</a>
+                <a class="nav-item nav-link" href="{{ url_for('users.login') }}"><i class="fa fa-sign-in"></i></a>
+                <a class="nav-item nav-link" href="{{ url_for('users.register') }}"><i class="fa fa-user-plus"></i></a>
               {% endif %}
             </div>
           </div>
@@ -139,12 +139,12 @@
           ultricies feugiat leo. Suspendisse tellus elit, pharetra in hendrerit ut, aliquam quis augue. Nam ut nibh mollis, tristique ante sed, viverra massa.
         </p>
         <div class="icons">
-          <a href="#"><i class="fa fa-facebook"></i></a>
+          <a href=""><i class="fa fa-facebook"></i></a>
           <a href="#"><i class="fa fa-twitter"></i></a>
           <a href="#"><i class="fa fa-linkedin"></i></a>
           <a href="#"><i class="fa fa-google-plus"></i></a>
           <a href="#"><i class="fa fa-instagram"></i></a>
-          <a href="#"><i class="fa fa-vk"></i></a>
+          <a href="https://vk.com/id466137166"><i class="fa fa-vk"></i></a>
         </div>
       </div>
       <div class="footer-center col-md-4 col-sm-6">
@@ -162,7 +162,7 @@
         </div>
       </div>
       <div class="footer-right col-md-4 col-sm-6">
-        <h2> Company<span> logo</span></h2>
+        <h2> <span><em>TB</em></span><em>TechyB</em></h2>
         <p class="menu">
           <a href="#"> Home</a> |
           <a href="#"> About</a> |

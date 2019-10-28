@@ -22,15 +22,15 @@ class User(db.Model, UserMixin):
     email=db.Column(db.String(120), unique=True, nullable=False)
     image_file=db.Column(db.String(20), nullable=False, default='default.jpg')
     password=db.Column(db.String(60), nullable=False)
-    posts=db.relationship('Post', backref='author', lazy=True)
+    posts=db.relationship('Post', backref='author', lazy=True, cascade='all, delete-orphan')
     location=db.Column(db.String(30), nullable=True)  #ici
-    comment=db.relationship('Comment', backref='author', lazy=True)
-    files=db.relationship('File', backref='uploader',lazy=True)
+    comment=db.relationship('Comment', backref='author', lazy=True, cascade='all, delete-orphan')
+    files=db.relationship('File', backref='uploader',lazy=True, cascade='all, delete-orphan')
     aboutme=db.Column(db.Text, nullable=True)
     admin=db.Column(db.Boolean())
     confirmed=db.Column(db.Boolean, default=False)
-    liked=db.relationship('PostLike', backref='liker', lazy=True)
-    recommendations=db.relationship('Ebook', backref='recommender', lazy=True)
+    liked=db.relationship('PostLike', backref='liker', lazy=True, cascade='all, delete-orphan')
+    recommendations=db.relationship('Ebook', backref='recommender', lazy=True, cascade='all, delete-orphan')
     
 
     def is_admin(self):
@@ -129,8 +129,15 @@ class Comment(db.Model):
     content=db.Column(db.Text, nullable=False) 
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     post_id=db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    comment=db.relationship('Reply', backref='comment', lazy='dynamic', cascade='all, delete-orphan')
 
 
+class Reply(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    date_posted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    content=db.Column(db.Text, nullable=False)
+    user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    comment_id=db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
 
 class File(db.Model):
     id=db.Column(db.Integer, primary_key=True)
@@ -211,7 +218,6 @@ class UserAdminView(ModelView):
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
-
 
 
 admin.add_view(PostView(Post, db.session, category='Post'))

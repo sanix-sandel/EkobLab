@@ -9,7 +9,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_ckeditor import CKEditor
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
-
+from flask_share import Share
 
 
 db=SQLAlchemy()
@@ -21,7 +21,7 @@ mail = Mail()
 ckeditor=CKEditor()
 migrate=Migrate()
 admin=Admin()
-
+share=Share()
 
 def create_app(config_class=Config):
     Myapp=Flask(__name__)
@@ -34,7 +34,7 @@ def create_app(config_class=Config):
     admin.init_app(Myapp)
     ckeditor.init_app(Myapp)
     migrate.init_app(Myapp, db)
-
+    share.init_app(Myapp)
 
     from myapp.users.routes import users
     from myapp.posts.routes import posts
