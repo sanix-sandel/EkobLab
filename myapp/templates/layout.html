@@ -16,7 +16,9 @@
         <em><title>EkoB</title></em>
     {% endif %}
     <!--For summernote -->
-  
+    
+
+
 
     <!-- For Search box -->
     
@@ -26,12 +28,19 @@
 
     <!-- for the icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  
+  <style>
+    img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  </style>    
+
 </head>
 
 
 <body>
+  
    
-   {{ckeditor.load()}}
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
@@ -50,7 +59,7 @@
             <div class="container h-100">
               <div class="d-flex justify-content-center h-100">
                 <div class="searchbar">
-                  <input class="search_input" type="text" name="" placeholder="Search...">
+                  <input class="search_input" type="text" name="textsearched" placeholder="Search...">
                   <a href="#" class="search_icon"><i class="fa fa-search"></i></a>
                 </div>
               </div>

@@ -48,6 +48,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .content-section {
+  white-space: normal;
+  word-break:break-all;
   background: #ffffff;
   padding: 10px 20px;
   border: 1px solid #dddddd;
@@ -55,7 +57,16 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 20px;
 }
 
-
+.article-body{
+  white-space: normal;
+  word-break:break-all;
+  color:black;
+  display:block;
+  padding: 10px 20px;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  margin-bottom: 20px;
+}
 
 .article-title {
   color:#444444;
@@ -69,6 +80,8 @@ a.article-title:hover {
 .article-content {
   white-space: pre-line;
   color:black;
+  
+  
 }
 
 .article-img {

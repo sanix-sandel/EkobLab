@@ -18,18 +18,27 @@
         {% endif %}
       </div>
         <h2 class="article-title">{{ post.title|safe }}</h2>
-        <p class="article-content">{{ post.content|safe }}</p>
+
+        <div class="article-body">
+          {{ post.content|safe }}
+        </div>
+        
     </div>
-    
+    <i class="thumbs">
+      <p>
+        <a href="{{url_for('posts.like_action', post_id=post.id, action='like')}}" class="fa fa-heart"></a>         <a href="{{url_for('posts.like_action', post_id=post.id, action='unlike')}}" class="fa fa-thumbs-down"></a>  
+        <a href="{{url_for('comments.get_comment', post_id=post.id)}}" class="fa fa-comment">{{ post.nbcomments }} </a>
+      </p>
+    </i>
 
   </article>
-  <i class="thumbs">
+ <!-- <i class="thumbs">
       <p>
         <a href="{{url_for('posts.like_action', post_id=post.id, action='like')}}" class="fa fa-heart"></a>         <a href="{{url_for('posts.like_action', post_id=post.id, action='unlike')}}" class="fa fa-thumbs-down"></a>  
         <a href="{{url_for('comments.get_comment', post_id=post.id)}}" class="fa fa-comment">{{ post.nbcomments }} </a>
       </p>
   </i>
-
+-->
 
   <!-- Modal -->
   <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">

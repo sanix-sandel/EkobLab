@@ -22,8 +22,24 @@ def new_post():
         db.session.commit()
         flash('Your post has been created!', 'succes')
         return redirect(url_for('main.home'))   
-    return render_template('create_post.html', title='New Post',
-                           form=form, legend='New Post')
+    return render_template('create_post.html', form=form, title='New Post', legend='New post')
+
+
+
+@posts.route("/post/newpost", methods=['GET', 'POST'])
+@login_required
+def newpost():
+    if request.method == 'POST':
+        content=request.form.get('postcontent')
+        post = Post(title="Essas", content=content, author=current_user, reads=0, nbcomments=0)
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post has been created!', 'succes')
+        return redirect(url_for('main.home'))   
+    return render_template('new_post.html', title='New Post')
+
+
+
 
 
 @posts.route("/post/<int:post_id>", methods=['GET', 'POST'])
@@ -36,7 +52,7 @@ def post(post_id):
     form=CommentForm()
    
     rposts=Post.query.filter(Post.id != post.id ).filter_by(genre=post.genre).limit(5).all()
-    if form.is_submitted():
+    if form.validate_on_submit():
         comment=Comment(content=form.content.data, author=current_user, post_id=post_id )
         db.session.add(comment)
         post.nbrcomments()

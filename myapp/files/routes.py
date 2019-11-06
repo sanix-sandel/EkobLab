@@ -1,8 +1,8 @@
 from flask import (render_template, url_for, flash,
-                   redirect, request, abort, Blueprint, request, send_file)
+                   redirect, request, abort, Blueprint, request, send_file, Response)
 from flask_login import current_user, login_required
 from myapp import db
-from myapp.models import File, Ebook
+from myapp.models import File, Ebook, Cover
 from myapp.files.forms import FileForm, EbookForm
 import bleach
 from io import BytesIO
@@ -12,13 +12,19 @@ from myapp import mail
 
 
 
+
 files=Blueprint('files', __name__)
 
 
 ALLOWED_EXTENSIONS=set(['pdf'])
+EXTENSIONS_ALLOWED=set(['jpeg', 'png', 'jpg'])
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def file_allowed(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in EXTENSIONS_ALLOWED
+
 
 @login_required
 @files.route("/files", methods=['GET', 'POST'])
@@ -26,6 +32,14 @@ def allfiles():
     page = request.args.get('page', 1, type=int)
     files = File.query.order_by(File.date_posted.desc()).paginate(page=page, per_page=5)
     return render_template('files.html', files=files)
+
+
+@files.route('/img/<int:img_id>', methods=['GET', 'POST'])
+def serve_image(img_id):
+    image=Cover.query.get_or_404(img_id)
+    return image.data
+    """return Response(image, nimetype='image/jpg')"""
+
 
 @login_required
 @files.route('/home/upload', methods=['GET', 'POST'])
@@ -42,13 +56,24 @@ def upload():
             return redirect(request.url)    
         if not allowed_file(file.filename):
             flash('Only PDF files, please', 'danger')
+
+        cover=request.files['cover']
+        if not file_allowed(cover.filename):
+            flash('Only png, jpeg, jpg files allowed')
+         
     #if form.is_submitted():
         else:
 
             flash('Your file has been successfully uploaded !', 'succes')
+            
             newFile=File(title=file.filename, data=file.read(), description=form.description.data, uploader=current_user, downloaded=0)
+            cover=Cover(file=newFile, data=cover.read())
+            db.session.add(cover)
+            db.session.commit()  
+            newFile.img_id=cover.id
             db.session.add(newFile)
-            db.session.commit()    
+            db.session.commit()  
+              
     return render_template("fileupload.html", form=form)
     
 
@@ -59,7 +84,7 @@ def upload():
 def file(file_id):
     
     file = File.query.get_or_404(file_id)
-    return render_template('file.html', title=file.title, file=file, file_id=file_id)
+    return render_template('file.html', title=file.title, file=file, file_id=file_id, cover=file.cover, img_id=file.img_id)
 
 @login_required
 @files.route('/file/<int:file_id>/download', methods=['POST', 'GET'])

@@ -33,7 +33,9 @@
         <small class="text-muted">{{ comment.author.username }}</small>
       <small class="text-muted">{{ comment.date_posted.strftime('%Y-%m-%d') }}</small>
       <small class="text-muted">{{ comment.author.location }}</small>
-      
+      {% if comment.receveur %}
+        <small class="text-muted">reply to {{ comment.receveur }}</small>
+      {% endif %}
     </div>
     
     <p class="article-content">{{ comment.content | safe }}</p>

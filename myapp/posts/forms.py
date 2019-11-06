@@ -7,7 +7,7 @@ import bleach
 
 class PostForm(FlaskForm):
     title=StringField('Title', validators=[DataRequired(), Length(min=5, max=50)])
-    content=CKEditorField("What's up ?", validators=[DataRequired()])
+    content=TextAreaField("What's up ?", validators=[DataRequired()])
     submit=SubmitField('Post')
     
 
