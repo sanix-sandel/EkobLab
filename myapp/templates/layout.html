@@ -10,6 +10,8 @@
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}"></link>
 
+    <link rel="icon" type="image/png" href="static/LgBrowser.png" />
+
     {% if title %}
         <em><title>EkoB - {{ title }}</title></em>
     {% else %}
@@ -44,7 +46,7 @@
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="/"><b><em>EkoB</em></b></a>
+          <a class="navbar-brand mr-4" href="/"><img class="logo" src="static/logopage.png"></b></a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -53,18 +55,9 @@
               <a class="nav-item nav-link" href="{{ url_for('main.home') }}"><i class="fa fa-home"></i></a>
               <a class="nav-item nav-link" href="{{ url_for('main.about') }}"><em> ? </em></a>
             </div>
-          {% if current_user.is_authenticated %}  
-            <!-- Search panel -->
+           
+             <!-- Search panel -->
             
-            <div class="container h-100">
-              <div class="d-flex justify-content-center h-100">
-                <div class="searchbar">
-                  <input class="search_input" type="text" name="textsearched" placeholder="Search...">
-                  <a href="#" class="search_icon"><i class="fa fa-search"></i></a>
-                </div>
-              </div>
-            </div>
-          {% endif %}
 
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
@@ -150,8 +143,6 @@
         <div class="icons">
           <a href=""><i class="fa fa-facebook"></i></a>
           <a href="#"><i class="fa fa-twitter"></i></a>
-          <a href="#"><i class="fa fa-linkedin"></i></a>
-          <a href="#"><i class="fa fa-google-plus"></i></a>
           <a href="#"><i class="fa fa-instagram"></i></a>
           <a href="https://vk.com/id466137166"><i class="fa fa-vk"></i></a>
         </div>
@@ -159,12 +150,9 @@
       <div class="footer-center col-md-4 col-sm-6">
         <div>
           <i class="fa fa-map-marker"></i>
-          <p><span> Street name and number</span> Brazzaville, Rep.Congo</p>
+          <p> Brazzaville, Rep.Congo</p>
         </div>
-        <div>
-          <i class="fa fa-phone"></i>
-          <p> (+00) 0000 000 000</p>
-        </div>
+
         <div>
           <i class="fa fa-envelope"></i>
           <p><a href="#"> techyintelo@gmail.com</a></p>
@@ -174,12 +162,11 @@
         <h2> <span><em>TB</em></span><em>TechyB</em></h2>
         <p class="menu">
           <a href="#"> Home</a> |
-          <a href="#"> About</a> |
-          <a href="#"> Services</a> |
-          <a href="#"> Portfolio</a> |
-          <a href="#"> News</a> |
-          <a href="#"> Contact</a>
+          <a href="{{ url_for('main.about') }}"> About</a> |
+      
         </p>
+        
+        <img class="logo-bottom" src="static/logopage.png" href="{{url_for('main.home')}}">
         <p class="name"> TechyB Inc. &copy; 2019</p>
       </div>
     </footer>  

@@ -1,16 +1,36 @@
-from flask import render_template, request, Blueprint
-from myapp.models import Post
+from flask import (render_template, request, Blueprint, redirect, url_for, current_app, flash)
+from myapp.models import Post, File
+from myapp.files.forms import SearchForm
+from myapp import db
 
 main=Blueprint('main', __name__)
 
 
-@main.route("/")
-@main.route("/home")
+@main.route("/",methods=['GET', 'POST'])
+@main.route("/home", methods=['GET', 'POST'])
 def home():
+    form=SearchForm()
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
-    return render_template('home.html', posts=posts)
+    form=SearchForm()
+    if form.validate_on_submit():
+        searched=form.search.data
+        searched=searched.capitalize()
+        flash('Wahoo'+searched+'ds', 'success')
+        
+        
+        return search_results(searched)
+       
+    return render_template('home.html', posts=posts, form=form)
 
+
+@main.route('/home', methods=['GET', 'POST'])
+def search_results(searched):  
+    """Results=File.query.filter_by(title=searched).all()"""
+    Results=File.query.filter(File.title.like('%'+searched+'%')).all()
+   
+    return render_template('search.html', results=Results)
+                           
 
 @main.route("/about")
 def about():
@@ -27,5 +47,4 @@ def trend():
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.reads.desc()).paginate(page=page, per_page=5)
     return render_template('trending.html', posts=posts)
-
 

@@ -12,6 +12,7 @@ class Config:
     MAIL_PASSWORD = '19972017Russia'#os.environ.get('MAIL_PASSWORD')
     SIMPLEMDE_jS_IIFE=True
     SIMPLEMDE_USE_CDN=True
+    ELASTICSEARCH_URL='http://localhost:9200'
     
 
 

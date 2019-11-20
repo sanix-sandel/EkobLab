@@ -1,14 +1,16 @@
 from flask import (render_template, url_for, flash,
-                   redirect, request, abort, Blueprint, request, send_file, Response)
+                   redirect, request, abort, Blueprint, request, send_file, Response, g, current_app)
 from flask_login import current_user, login_required
 from myapp import db
 from myapp.models import File, Ebook, Cover
-from myapp.files.forms import FileForm, EbookForm
+from myapp.files.forms import FileForm, EbookForm, SearchForm
 import bleach
 from io import BytesIO
 from flask import Markup
 from flask_mail import Message
 from myapp import mail
+from sqlalchemy.orm.util import join
+from datetime import datetime
 
 
 
@@ -38,7 +40,7 @@ def allfiles():
 def serve_image(img_id):
     image=Cover.query.get_or_404(img_id)
     return image.data
-    """return Response(image, nimetype='image/jpg')"""
+    
 
 
 @login_required
@@ -66,7 +68,7 @@ def upload():
 
             flash('Your file has been successfully uploaded !', 'succes')
             
-            newFile=File(title=file.filename, data=file.read(), description=form.description.data, uploader=current_user, downloaded=0)
+            newFile=File(title=form.title.data.capitalize(), data=file.read(), description=form.description.data, uploader=current_user, downloaded=0)
             cover=Cover(file=newFile, data=cover.read())
             db.session.add(cover)
             db.session.commit()  
@@ -75,8 +77,6 @@ def upload():
             db.session.commit()  
               
     return render_template("fileupload.html", form=form)
-    
-
 
 
 @login_required
@@ -123,3 +123,13 @@ def ebooks():
     page = request.args.get('page', 1, type=int)
     ebooks = Ebook.query.order_by(Ebook.date_posted.desc()).paginate(page=page, per_page=5)
     return render_template('Ebooks.html', ebooks=ebooks)
+"""
+@files.route('/home/search')
+def getit():
+    if request.method=='POST':
+        nums=min(request.args.get('limit', 10), 50)
+        query=request.args.get('searched', '')
+        results=File.query.Search(query, limit=nums)
+        return render_template('search.html', results=results)
+    else:
+        None    """

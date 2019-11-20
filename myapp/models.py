@@ -1,6 +1,6 @@
 from datetime import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from myapp import db, login_manager, admin, bcrypt
+from myapp import (db, login_manager, admin, bcrypt)
 from flask import (current_app, flash, redirect,  url_for)
 from flask_login import UserMixin, current_user, login_required
 from myapp import admin
@@ -8,7 +8,6 @@ from flask_admin.contrib.sqla import ModelView
 from flask_admin import AdminIndexView, expose
 from flask_admin.form import rules
 from wtforms import widgets,TextAreaField, PasswordField
-
 
 
 
@@ -35,6 +34,7 @@ class User(db.Model, UserMixin):
     liked=db.relationship('PostLike', backref='liker', lazy='dynamic', cascade='all, delete-orphan')
     recommendations=db.relationship('Ebook', backref='recommender', lazy='dynamic', cascade='all, delete-orphan')
     
+    extend_existing=True
 
     def ping(self):
         self.last_seen=datetime.utcnow()
@@ -101,7 +101,7 @@ tags=db.Table('post_tags',
 )
 
 class Post(db.Model):
-    __searchable__=['title']
+   
     id=db.Column(db.Integer, primary_key=True)
     title=db.Column(db.String(50), nullable=False)   
     date_posted=db.Column(db.DateTime(), nullable=False, index=True, default=datetime.utcnow)
@@ -124,8 +124,13 @@ class Post(db.Model):
     def _set_read(self, reads):
         self._reads=reads
 
+    @property
     def like(self):
-        self.nbrlikes+=1    
+        return self.nbrlikes
+
+    @like.setter
+    def like(self):
+        self.nbrlikes+=1        
 
     def dislike(self):
         self.nbrlikes-=1     
@@ -158,8 +163,13 @@ class Reply(db.Model):
     comment_id=db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
     post_id=db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
 
+
+
 class File(db.Model):
-    __searchable__=['title']
+    __searchable__= ['title']
+   
+
+
     id=db.Column(db.Integer, primary_key=True)
     title=db.Column(db.String(40), nullable=False)   
     date_posted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -185,6 +195,10 @@ class File(db.Model):
         return f"File('{self.title}', '{self.date_posted}')"    
 
     _img_id=property(_set_img)
+
+
+
+
 
 class Cover(db.Model):
     id=db.Column(db.Integer, primary_key=True)
@@ -216,8 +230,6 @@ class Tag(db.Model):
 
     def __repr__(self):
         return f"Tag('{self.title}')" 
-
-
 
 class CKTextAreaWidget(widgets.TextArea):
     def __call__(self, field, **kwargs):

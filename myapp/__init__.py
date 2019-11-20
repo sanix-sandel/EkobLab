@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy 
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
@@ -11,10 +11,6 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 from flask_share import Share
 from myapp.tasks import make_celery
-
-
-
-
 
 
 db=SQLAlchemy()
@@ -34,8 +30,8 @@ def create_app(config_class=Config):
     Myapp.config.from_object(Config)
     Myapp.config['CELERY_BROKER_URL']='amqp://localhost//'
     Myapp.config['CELERY_RESULT_BACKEND']='postgresql://sanix:19972017Russia@localhost/db'
-    
-    from myapp.models import MyAdminIndexView
+   
+    from myapp.models import MyAdminIndexView, File
     db.init_app(Myapp)
     bcrypt.init_app(Myapp)
     login_manager.init_app(Myapp)

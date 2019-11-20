@@ -11,16 +11,17 @@
         
       </div>
         <h2 class="article-title">{{ file.title | safe }}</h2>
+        <img class="cover" src="{{url_for('files.serve_image', img_id=file.img_id)}}">
         <p class="article-content">{{ file.description | safe }}</p>
         
     </div>
     
   </article>
   
-  <a href="{{url_for('files.download', file_id=file_id)}}"><em>Download</em></a>
+  <a href="{{url_for('files.download', file_id=file_id)}}">
+   <button class="btn"><i class="fa fa-download"></i> Download </button>
+  </a>
 
-  <img src="{{url_for('files.serve_image', img_id=file.img_id)}}">
-  
   
 
 {% endblock content %}

@@ -103,11 +103,11 @@ def like_action(post_id, action):
     post = Post.query.filter_by(id=post_id).first_or_404()
     if action == 'like':
         current_user.like_post(post)
-        post.like()
+        post.like
         db.session.commit()
     if action == 'unlike':
         current_user.unlike_post(post)
         post.dislike()
         db.session.commit()
-    return redirect(request.referrer)
+    return redirect(url_for('posts.post', post_id=post.id))
 

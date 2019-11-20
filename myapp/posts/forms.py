@@ -6,8 +6,8 @@ import bleach
 
 
 class PostForm(FlaskForm):
-    title=StringField('Title', validators=[DataRequired(), Length(min=5, max=50)])
+    title=StringField('Title/Titre', validators=[DataRequired(), Length(min=5, max=50)])
     content=TextAreaField("What's up ?", validators=[DataRequired()])
-    submit=SubmitField('Post')
+    submit=SubmitField('Post/poster')
     
 

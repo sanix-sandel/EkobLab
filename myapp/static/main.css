@@ -51,7 +51,7 @@ h1, h2, h3, h4, h5, h6 {
   white-space: normal;
   word-break:break-all;
   background: #ffffff;
-  padding: 10px 20px;
+  padding: 10px 30px;
   border: 1px solid #dddddd;
   border-radius: 3px;
   margin-bottom: 20px;
@@ -119,6 +119,13 @@ a.article-title:hover {
   font-size: 2.5rem;
 }
 
+
+.cover{
+  height: 175px;
+  width: 175px;
+  margin-right: 20px;
+  margin-bottom: 16px;
+}
 
 .footer {
   background-color: #414141;
@@ -355,3 +362,49 @@ a.article-title:hover {
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {background-color: white;}
+
+
+/* Download Style buttons */
+.btn {
+  background-color: #00F9A9;
+  border: none;
+  color: #414141;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: black;
+}
+
+.logo{
+  display: inline-block;
+  width: 60px;
+  height: 35px;
+  cursor: pointer;
+  background-color: #33383b;
+  border-radius: 2px;
+  font-size: 20px;
+  color: #00F9A9;
+  text-align: center;
+  line-height: 35px;
+  margin-right: 3px;
+  margin-bottom: 5px;
+}
+
+.logo-bottom{
+  display: inline-block;
+  width: 120px;
+  height: 70px;
+  cursor: pointer;
+  background-color: #33383b;
+  border-radius: 2px;
+  font-size: 20px;
+  color: #00F9A9;
+  text-align: center;
+  line-height: 35px;
+  margin-right: 3px;
+  margin-bottom: 5px;
+}

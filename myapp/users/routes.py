@@ -39,9 +39,11 @@ def login():
         user=User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
              #alors on active le remember me, et ensuite on le renvoie a la prochaine page get by request
+            flash('Welocome back '+user.username+'', 'success')
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.home'))#si il voulait se connecter à 
+           
             #une page on le renvoie a la page, sinon à a page d'acceuil
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
@@ -133,6 +135,7 @@ def confirm(token):
     if current_user.confirm(token):
         db.session.commit()
         flash('You have confirmed your account, thank you !')
+         
     else:
         flash('The confirmation link is invalid or has expired')
     return redirect(url_for('main.home'))              
