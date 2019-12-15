@@ -74,7 +74,9 @@
                     <a href="{{url_for('files.ebooks')}}">Recommended ebooks</a>
                   </div>
                 </div>
+                
                 <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}"><i class="fa fa-paper-plane-o"></i></a>
+               
                 <a class="nav-item nav-link" href="{{ url_for('users.account') }}" ><i class="fa fa-user-circle"></i></a>
                 <a class="nav-item nav-link" href="{{ url_for('users.logout') }}"><i class="fa fa-power-off"></i></a>
 
@@ -102,6 +104,7 @@
           {% endwith %}
           {% block content %}{% endblock %}
         </div>
+        <!--
         <div class="col-md-4">
           <div class="content-section">
             <h3>Extras !</h3>
@@ -121,6 +124,7 @@
             </p>
           </div>
         </div>
+        -->
        
       </div>
     </main>

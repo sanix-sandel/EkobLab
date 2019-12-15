@@ -2,9 +2,9 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint)
 from flask_login import current_user, login_required
 from myapp import db
-from myapp.models import Post, Comment
+from myapp.models import Post, Comment, Tag, Reply
 from myapp.posts.forms import PostForm
-from myapp.comments.forms import CommentForm, ReplyForm
+from myapp.comments.forms import CommentForm
 import bleach
 from flask import Markup
 from flask import send_from_directory
@@ -17,27 +17,38 @@ posts=Blueprint('posts', __name__)
 def new_post():
     form=PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=(form.content.data), author=current_user, reads=0, nbcomments=0)
+        post = Post(title=form.title.data, content="", author=current_user, reads=0, nbcomments=0)
         db.session.add(post)
         db.session.commit()
-        flash('Your post has been created!', 'succes')
-        return redirect(url_for('main.home'))   
+        flash('Your Post need a content!', 'succes')
+        return redirect(url_for('posts.Newpost', post_id=post.id))   
     return render_template('create_post.html', form=form, title='New Post', legend='New post')
 
 
 
-@posts.route("/post/newpost", methods=['GET', 'POST'])
+@posts.route("/post/newpost/<int:post_id>", methods=['GET', 'POST'])
 @login_required
-def newpost():
+def Newpost(post_id):
+    post = Post.query.get_or_404(post_id)
     if request.method == 'POST':
-        content=request.form.get('postcontent')
-        post = Post(title="Essas", content=content, author=current_user, reads=0, nbcomments=0)
+        flash('ddzz', 'success')
+        content=request.args.get('postcontent')
+        if content=="":
+            flash('The post must have a content', 'danger')
+            db.session.delete(post)
+            db.session.commit()
+            return redirect(url_for('main.home'))
+        post.content=content
+        
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'succes')
-        return redirect(url_for('main.home'))   
+        return redirect(url_for('main.home')) 
+    else:
+        flash('You canceled', 'danger')
+        return redirect(url_for('main.home'))    
+      
     return render_template('new_post.html', title='New Post')
-
 
 
 
@@ -47,20 +58,54 @@ def newpost():
 def post(post_id):
     
     post = Post.query.get_or_404(post_id)
-    post.reads+=1
+    post.read+=1
     db.session.commit()
-    form=CommentForm()
-   
+    comments= Comment.query.filter_by(post_id=post_id)\
+        .order_by(Comment.date_posted.desc())\
+        .all()
     rposts=Post.query.filter(Post.id != post.id ).filter_by(genre=post.genre).limit(5).all()
-    if form.validate_on_submit():
-        comment=Comment(content=form.content.data, author=current_user, post_id=post_id )
-        db.session.add(comment)
-        post.nbrcomments()
-        db.session.commit()
-        flash('Your comment has been added', 'success')
-        return redirect (url_for('posts.post', post_id=post.id))
-    return render_template('post.html', title=post.title, post=post, form=form, rposts=rposts)
+    if request.method=="POST":
+        content=request.form.get('comment')
+        
+        if len(content) > 0:
+            return commenter(content, post.id) 
+
+    return render_template('post.html', title=post.title, post=post, rposts=rposts, comments=comments)
                                                   
+
+
+@posts.route("/post/<int:post_id>/comment", methods=['GET', 'POST'])
+@login_required
+def commenter(content, post_id):
+    post=Post.query.get_or_404(post_id)
+    flash('jkjjkj', 'success')
+    
+    comment=Comment(content=content, author=current_user, post_id=post_id )
+    db.session.add(comment)
+    db.session.commit()
+    post.nbrcomments=1
+    db.session.commit()
+    flash('Your comment has been added', 'success')
+    return redirect (url_for('main.home'))
+   
+
+
+@posts.route("/post/<int:post_id>/<int:comment_id>/reply", methods=['GET', 'POST'])
+@login_required
+def reply(comment_id, post_id):
+    comment=Comment.query.get_or_404(comment_id)
+    post=Post.query.get_or_404(post_id)
+    
+    content=request.form.get('reply')
+    if len(content)>0:
+        reply=Reply(content=content, author=current_user, comment_id=comment.id)
+        db.session.add(reply)
+        db.session.commit()
+        flash('Your reply has been added', 'success')
+        return redirect (url_for('posts.post', post_id=post.id))
+    else:    
+        flash('hjehfjhfe', 'danger')
+    return redirect (url_for('main.home'))
 
 
 
@@ -103,7 +148,7 @@ def like_action(post_id, action):
     post = Post.query.filter_by(id=post_id).first_or_404()
     if action == 'like':
         current_user.like_post(post)
-        post.like
+        post.like+=1
         db.session.commit()
     if action == 'unlike':
         current_user.unlike_post(post)
@@ -111,3 +156,12 @@ def like_action(post_id, action):
         db.session.commit()
     return redirect(url_for('posts.post', post_id=post.id))
 
+
+@posts.route('/post/<int:tag_id>/')
+def tag_posts(tag_id):
+    tag=Tag.query.filter_by(id=tag_id).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    posts=tag.posts.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
+    
+    
+    return render_template('tag_posts.html', posts=posts)

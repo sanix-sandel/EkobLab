@@ -38,8 +38,17 @@
               <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
               <small class="text-muted">{{ post.author.location }}</small>
             </div>
-            <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
-            <p class="article-content">{{ post.content[:220]|safe}} <a href="{{url_for('posts.post', post_id=post.id)}}">Read more...</a></p>
+            <div class="article-metadata">
+              <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
+              <p class="article-content">{{ post.content[:220]|safe}} <a href="{{url_for('posts.post', post_id=post.id)}}">Read more...</a></p>
+              <div> <!--POur les tags-->
+                {% for tags in post.tags %}
+                  <span class="badge badge-primary">{{ tags.title }}</span>
+                  
+                {% endfor %}
+              </div>
+            </div>
+            
           </div>
         </article>
     {% endfor %}

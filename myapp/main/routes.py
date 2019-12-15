@@ -27,9 +27,10 @@ def home():
 @main.route('/home', methods=['GET', 'POST'])
 def search_results(searched):  
     """Results=File.query.filter_by(title=searched).all()"""
-    Results=File.query.filter(File.title.like('%'+searched+'%')).all()
+    Results1=File.query.filter(File.title.like('%'+searched+'%')).all()
+    Results2=Post.query.filter(Post.title.like('%'+searched+'%')).all()
    
-    return render_template('search.html', results=Results)
+    return render_template('search.html', results1=Results1, results2=Results2)
                            
 
 @main.route("/about")

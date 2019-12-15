@@ -25,11 +25,13 @@ class User(db.Model, UserMixin):
     posts=db.relationship('Post', backref='author', lazy='dynamic', cascade='all, delete-orphan')
     location=db.Column(db.String(30), nullable=True)  #ici
     member_since=db.Column(db.DateTime(), default=datetime.utcnow)
-    last_seen=db.Column(db.DateTime(), default=datetime.utcnow)
+    
     comment=db.relationship('Comment', backref='author', lazy='dynamic', cascade='all, delete-orphan')
+    reply=db.relationship('Reply', backref='author', lazy='dynamic', cascade='all, delete-orphan')
     files=db.relationship('File', backref='uploader',lazy='dynamic', cascade='all, delete-orphan')
     aboutme=db.Column(db.Text, nullable=True)
-    admin=db.Column(db.Boolean())
+    admin=db.Column(db.Boolean(), default=False)
+    publisher=db.Column(db.Boolean(), default=False)
     confirmed=db.Column(db.Boolean, default=False)
     liked=db.relationship('PostLike', backref='liker', lazy='dynamic', cascade='all, delete-orphan')
     recommendations=db.relationship('Ebook', backref='recommender', lazy='dynamic', cascade='all, delete-orphan')
@@ -43,6 +45,9 @@ class User(db.Model, UserMixin):
 
     def is_admin(self):
         return self.admin
+
+    def is_publisher(self):
+        return self.publisher    
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
@@ -94,11 +99,13 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User ('{self.username}','{self.email}', '{self.image_file}')"   
 
+
 tags=db.Table('post_tags',
     db.Column('post_id', db.Integer, db.ForeignKey('post.id')),
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
 
 )
+
 
 class Post(db.Model):
    
@@ -109,41 +116,49 @@ class Post(db.Model):
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     genre=db.Column(db.String(20), nullable=False, default='chat')
     comment=db.relationship('Comment', backref='post_comments', lazy='dynamic', cascade='all, delete-orphan')
-    replies=db.relationship('Reply', backref='post_replies', lazy='dynamic', cascade='all, delete-orphan')
     tags=db.relationship('Tag', secondary=tags, backref=db.backref('posts', lazy='dynamic'), lazy='dynamic')
-    _reads=db.Column(db.Integer, default=0)
-    reads=_reads
+    reads=db.Column(db.Integer, default=0)
+    
     nbcomments=db.Column(db.Integer, default=0)
     liked=db.relationship('PostLike', backref='post_liked', lazy='dynamic', cascade='all, delete-orphan')
-    nbrlikes=db.Column(db.Integer, nullable=True)
-
+    nbrlikes=db.Column(db.Integer, default=0)
 
    
     extend_existing=True
 
-    def _set_read(self, reads):
-        self._reads=reads
+    @property
+    def read(self):
+        return self.reads
+
+    @read.setter
+    def read(self, r):
+        self.reads=r
+        
 
     @property
     def like(self):
         return self.nbrlikes
 
     @like.setter
-    def like(self):
-        self.nbrlikes+=1        
+    def like(self, r):
+        self.nbrlikes=r        
 
+    @like.setter
     def dislike(self):
         self.nbrlikes-=1     
 
+    @property
     def nbrcomments(self):
         self.nbcomments+=1
 
-    _reads=property(_set_read)    
+    @nbrcomments.setter
+    def nbrcomments(self, c):
+        self.nbcomments=c
+       
     
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
-
 
 
 class Comment(db.Model):
@@ -152,8 +167,16 @@ class Comment(db.Model):
     content=db.Column(db.Text, nullable=False) 
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     post_id=db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    comment=db.relationship('Reply', backref='comment', lazy='dynamic', cascade='all, delete-orphan')
-    receveur=db.Column(db.String, nullable=True)
+    reply=db.relationship('Reply', backref='comment', lazy='dynamic', cascade='all, delete-orphan')
+    nbrep=db.Column(db.Integer, default=0)
+
+    @property
+    def rep(self):
+        return self.rep
+
+    @rep.setter
+    def rep(self, rep):
+        self.nbrep+=rep    
 
 class Reply(db.Model):
     id=db.Column(db.Integer, primary_key=True)
@@ -161,14 +184,14 @@ class Reply(db.Model):
     content=db.Column(db.Text, nullable=False)
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     comment_id=db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
-    post_id=db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-
-
+    
+    def __repr__(self):
+        return f"Reply('{self.author.username}')"
+    
 
 class File(db.Model):
     __searchable__= ['title']
    
-
 
     id=db.Column(db.Integer, primary_key=True)
     title=db.Column(db.String(40), nullable=False)   
@@ -195,9 +218,6 @@ class File(db.Model):
         return f"File('{self.title}', '{self.date_posted}')"    
 
     _img_id=property(_set_img)
-
-
-
 
 
 class Cover(db.Model):
@@ -271,17 +291,21 @@ class PostView(ModelView):
     form_overrides=dict(content=CKTextAreaField)
     column_searchable_list=('title', 'content')
     column_exclude_list=('content')
-    
-
+   
     create_template='new.html'
     edit_template='new.html'
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
 
+
 class CommentView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
+
+class ReplyView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin    
 
 
 class CoverView(ModelView):
@@ -293,21 +317,26 @@ class CoverView(ModelView):
 
 class FilesView(ModelView):
     column_exclude_list = ('data',)
+    column_searchable_list=('title',)
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin   
 
 
-
 class EbookView(ModelView):
     def is_accessible(self):
-        return current_user.is_authenticated and current_user.is_admin                
+        return current_user.is_authenticated and current_user.is_admin 
+
+class TagView(ModelView):
+    column_searchable_list=('title',)
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin                        
 
 class UserAdminView(ModelView):
     column_searchable_list=('username',)
-    column_sortable_list = ('username', 'admin', 'email', 'location','aboutme',)
+    column_sortable_list = ('username', 'admin', 'email', 'location','aboutme', 'confirmed',)
     column_exclude_list = ('password',)
     form_excluded_columns = ('password',)
-    form_edit_rules = ('username', 'admin', 'email', 'location', 'aboutme',)
+    form_edit_rules = ('username', 'admin', 'email', 'location', 'aboutme', 'publisher', 'confirmed')
     form_create_rules=('username', 'email', 'admin', 'location', 'aboutme')
 
     def is_accessible(self):
@@ -320,8 +349,12 @@ admin.add_view(UserAdminView(User, db.session))
 
 admin.add_view(CommentView(Comment, db.session))
 
+admin.add_view(ReplyView(Reply, db.session))
+
 admin.add_view(FilesView(File, db.session))
 
 admin.add_view(EbookView(Ebook, db.session))
 
 admin.add_view(CoverView(Cover, db.session))
+
+admin.add_view(TagView(Tag, db.session))

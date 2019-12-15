@@ -1,8 +1,53 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<p>{{taille}}</p>
-  {% for result in results %}
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" href="#profile" role="tab" data-toggle="tab">Files</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#buzz" role="tab" data-toggle="tab">Posts</a>
+    </li>
+   
+  </ul>
+
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane fade in active" id="profile">
+      {% for result in results1 %}
+        <article class="media content-section">
+              
+          <div class="media-bodyb">
+            <div class="article-metadata">
+                 <a class="mr-2" >{{ result.uploader.username }}</a>
+                  <small class="text-muted">{{ result.date_posted.strftime('%Y-%m-%d') }}</small>
+                  <small class="text-muted">{{ result.uploader.location }}</small>
+            </div>
+                <h2><a class="article-title" href="{{ url_for('files.file', file_id=result.id) }}">{{ result.title }}</a></h2>
+                
+                <p class="article-content">{{ result.description[:30]|safe}} <a href="{{url_for('files.file', file_id=result.id)}}">Read more...</a></p>
+          </div>
+        </article>
+        {% endfor %}
+    </div>
+    <div role="tabpanel" class="tab-pane fade" id="buzz">
+      {% for result in results2 %}
+        <article class="media content-section">
+              
+          <div class="media-bodyb">
+            <div class="article-metadata">
+                 <a class="mr-2" >{{ result.author.username }}</a>
+                  <small class="text-muted">{{ result.date_posted.strftime('%Y-%m-%d') }}</small>
+                  <small class="text-muted">{{ result.author.location }}</small>
+            </div>
+                <h2><a class="article-title" href="{{ url_for('posts.post', post_id=result.id) }}">{{ result.title }}</a></h2>
+                
+                <p class="article-content">{{ result.content[:30]|safe}} <a href="{{url_for('posts.post', post_id=result.id)}}">Read more...</a></p>
+          </div>
+        </article>
+      {% endfor %} 
+    </div>
+  <!--
+  {% for result in results1 %}
     <article class="media content-section">
           
       <div class="media-bodyb">
@@ -18,6 +63,7 @@
     </article>
 
   {% endfor %} 
-
+-->
+</div>
 
 {% endblock content %}

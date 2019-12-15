@@ -48,6 +48,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .content-section {
+  
+  width: 850px;
   white-space: normal;
   word-break:break-all;
   background: #ffffff;
@@ -57,16 +59,20 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 20px;
 }
 
-.article-body{
+
+
+.media-body{
   white-space: normal;
-  word-break:break-all;
+  word-break:break-all; 
   color:black;
   display:block;
-  padding: 10px 20px;
+  padding: 10px 40px;
   border: 1px solid #dddddd;
   border-radius: 3px;
-  margin-bottom: 20px;
+  margin-bottom: 1px;
 }
+
+
 
 .article-title {
   color:#444444;
@@ -80,7 +86,7 @@ a.article-title:hover {
 .article-content {
   white-space: pre-line;
   color:black;
-  
+  padding: 10px 10px;
   
 }
 
@@ -407,4 +413,37 @@ a.article-title:hover {
   line-height: 35px;
   margin-right: 3px;
   margin-bottom: 5px;
+}
+
+
+.h7 {
+  font-size: 0.8rem;
+}
+
+.gedf-wrapper {
+  margin-top: 0.97rem;
+}
+
+@media (min-width: 992px) {
+  .gedf-main {
+      padding-left: 4rem;
+      padding-right: 4rem;
+  }
+  .gedf-card {
+      margin-bottom: 2.77rem;
+  }
+}
+
+
+
+.form-inline .form-group { margin-right:10px; }
+.well-primary {
+color: rgb(255, 255, 255);
+background-color: rgb(66, 139, 202);
+border-color: rgb(53, 126, 189);
+}
+.glyphicon { margin-right:5px;}
+
+.reponses{
+  background-color: gray;
 }

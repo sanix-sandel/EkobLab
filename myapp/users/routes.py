@@ -19,7 +19,7 @@ def register():
     form=RegistrationForm()
     if form.validate_on_submit():#si il valide son enregistrement, ses donnnées sont envoyées à la DB
         hashed_password=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=False)
+        user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=False, publisher=False)
         db.session.add(user)
         db.session.commit()
         token=user.generate_confirmation_token()
@@ -38,6 +38,9 @@ def login():
     if form.validate_on_submit():
         user=User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
+            if not user.confirmed:
+                flash(''+user.username +' You have to confirm your mail account please', 'danger')
+                return redirect(url_for('users.login'))
              #alors on active le remember me, et ensuite on le renvoie a la prochaine page get by request
             flash('Welocome back '+user.username+'', 'success')
             login_user(user, remember=form.remember.data)
