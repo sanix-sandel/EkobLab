@@ -44,9 +44,9 @@
      
     </div>
     <div class="card-footer">
-      <a href="{{url_for('posts.like_action', post_id=post.id, action='like')}}" class="card-link"><i class="fa fa-gittip"></i> Like</a>
+      <a href="{{url_for('posts.like_action', post_id=post.id, action='like')}}" class="card-link"><i class="fa fa-gittip"></i> ({{post.nbrlikes}})Like</a>
       
-      <a href="#" class="card-link"><i class="fa fa-comment"></i> Comment</a>
+      <a href="#" class="card-link"><i class="fa fa-comment"></i> ({{post.nbcomments}})Comment</a>
       <a href="#" class="card-link"><i class="fa fa-mail-forward"></i> Share</a>
     </div>
   </div>

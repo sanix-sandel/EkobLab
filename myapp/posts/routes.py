@@ -12,41 +12,35 @@ from flask import send_from_directory
 posts=Blueprint('posts', __name__)
 
 
-@posts.route("/post/new", methods=['GET', 'POST'])
+@posts.route("/post/newpost", methods=['GET', 'POST'])
 @login_required
 def new_post():
     form=PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content="", author=current_user, reads=0, nbcomments=0)
-        db.session.add(post)
-        db.session.commit()
+        title=form.title.data
+        
         flash('Your Post need a content!', 'succes')
-        return redirect(url_for('posts.Newpost', post_id=post.id))   
+        return redirect(url_for('posts.Newpost', title=title))   
     return render_template('create_post.html', form=form, title='New Post', legend='New post')
 
 
 
-@posts.route("/post/newpost/<int:post_id>", methods=['GET', 'POST'])
+@posts.route("/post/newpost/<string:title>", methods=['GET', 'POST'])
 @login_required
-def Newpost(post_id):
-    post = Post.query.get_or_404(post_id)
-    if request.method == 'POST':
-        flash('ddzz', 'success')
-        content=request.args.get('postcontent')
+def Newpost(title):
+    
+    if request.method=='POST':
+        content=request.form.get('postcontent')
         if content=="":
             flash('The post must have a content', 'danger')
-            db.session.delete(post)
-            db.session.commit()
             return redirect(url_for('main.home'))
-        post.content=content
+        else:    
+            post=Post(title=title, content=content, author=current_user)
         
-        db.session.add(post)
-        db.session.commit()
-        flash('Your post has been created!', 'succes')
-        return redirect(url_for('main.home')) 
-    else:
-        flash('You canceled', 'danger')
-        return redirect(url_for('main.home'))    
+            db.session.add(post)
+            db.session.commit()
+            flash('Your post has been created!', 'succes')
+            return redirect(url_for('main.home'))    
       
     return render_template('new_post.html', title='New Post')
 

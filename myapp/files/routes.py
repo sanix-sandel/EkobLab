@@ -2,7 +2,7 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint, request, send_file, Response, g, current_app)
 from flask_login import current_user, login_required
 from myapp import db
-from myapp.models import File, Ebook, Cover
+from myapp.models import File, Ebook, Cover, User, Notif
 from myapp.files.forms import FileForm, EbookForm, SearchForm
 import bleach
 from io import BytesIO
@@ -77,6 +77,54 @@ def upload():
             db.session.commit()  
               
     return render_template("fileupload.html", form=form)
+
+
+@login_required
+@files.route('/home/upload/<int:recommender_id>', methods=['GET', 'POST'])
+def uploadv(recommender_id):
+    form=FileForm()
+    recommender=User.query.filter_by(id=recommender_id).first()
+    if request.method=='POST':
+
+        if 'file' not in request.files:
+            flash('No file part !')
+        file=request.files['file']
+
+        if file.filename=='':
+            flash('No file selected ', 'danger')
+            return redirect(request.url)    
+        if not allowed_file(file.filename):
+            flash('Only PDF files, please', 'danger')
+
+        cover=request.files['cover']
+        if not file_allowed(cover.filename):
+            flash('Only png, jpeg, jpg files allowed')
+         
+    #if form.is_submitted():
+        else:
+
+            flash('Your file has been successfully uploaded !', 'succes')
+            flash('thank You very much, Keep helping the biblio grow', 'succes')
+            
+            newFile=File(title=form.title.data.capitalize(), data=file.read(), description=form.description.data, uploader=current_user, downloaded=0)
+            cover=Cover(file=newFile, data=cover.read())
+            db.session.add(cover)
+            db.session.commit()  
+            newFile.img_id=cover.id
+            db.session.add(newFile)
+            db.session.commit() 
+
+            msg = Message('E-Books Recommendation',
+                  sender='techyintelo@gmail.com',
+                  recipients=[recommender.email])
+            msg.body = f'''Woopi ! the ebook you needed has been uploaded by a volunteer ! You can check it out 
+            If you did not make this request then simply ignore this email and no changes will be made.
+            TechyB Team.
+                '''
+            mail.send(msg)
+
+              
+    return render_template("fileupload2.html", form=form)
 
 
 @login_required

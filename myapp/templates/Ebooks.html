@@ -6,6 +6,7 @@
           <div class="media-body">
             <h2>{{ ebook.title }}</h2>
             <p class="article-content">{{ ebook.author|safe}} </p>
+            <a href="{{url_for('files.uploadv', recommender_id=ebook.recommender.id)}}"><button class="btn"> Upload </button></a>
           </div>
         </article>
     {% endfor %}

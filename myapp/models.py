@@ -16,6 +16,12 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+notifs=db.Table('user_notifs',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('notif_id', db.Integer, db.ForeignKey('notif.id'))
+
+)
+
 class User(db.Model, UserMixin):
     id=db.Column(db.Integer, primary_key=True)
     username=db.Column(db.String(20), unique=True, nullable=False)
@@ -25,7 +31,7 @@ class User(db.Model, UserMixin):
     posts=db.relationship('Post', backref='author', lazy='dynamic', cascade='all, delete-orphan')
     location=db.Column(db.String(30), nullable=True)  #ici
     member_since=db.Column(db.DateTime(), default=datetime.utcnow)
-    
+    notifs=db.relationship('Notif', secondary=notifs, backref=db.backref('user', lazy='dynamic'), lazy='dynamic')
     comment=db.relationship('Comment', backref='author', lazy='dynamic', cascade='all, delete-orphan')
     reply=db.relationship('Reply', backref='author', lazy='dynamic', cascade='all, delete-orphan')
     files=db.relationship('File', backref='uploader',lazy='dynamic', cascade='all, delete-orphan')
@@ -251,6 +257,13 @@ class Tag(db.Model):
     def __repr__(self):
         return f"Tag('{self.title}')" 
 
+class Notif(db.Model):
+    id=db.Column(db.Integer(), primary_key=True)
+    message=db.Column(db.Text())
+
+    def __repr__(self):
+        return f"Notif('{self.message}')"         
+
 class CKTextAreaWidget(widgets.TextArea):
     def __call__(self, field, **kwargs):
         kwargs.setdefault('class_', 'ckeditor')
@@ -329,7 +342,12 @@ class EbookView(ModelView):
 class TagView(ModelView):
     column_searchable_list=('title',)
     def is_accessible(self):
-        return current_user.is_authenticated and current_user.is_admin                        
+        return current_user.is_authenticated and current_user.is_admin  
+
+class NotifView(ModelView):
+    column_searchable_list=('message',)
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin                               
 
 class UserAdminView(ModelView):
     column_searchable_list=('username',)
@@ -358,3 +376,5 @@ admin.add_view(EbookView(Ebook, db.session))
 admin.add_view(CoverView(Cover, db.session))
 
 admin.add_view(TagView(Tag, db.session))
+
+admin.add_view(NotifView(Notif, db.session))
