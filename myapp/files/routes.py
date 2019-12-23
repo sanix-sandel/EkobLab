@@ -102,7 +102,7 @@ def uploadv(recommender_id):
          
     #if form.is_submitted():
         else:
-
+            
             flash('Your file has been successfully uploaded !', 'succes')
             flash('thank You very much, Keep helping the biblio grow', 'succes')
             
@@ -113,6 +113,7 @@ def uploadv(recommender_id):
             newFile.img_id=cover.id
             db.session.add(newFile)
             db.session.commit() 
+            recommender=[]
 
             msg = Message('E-Books Recommendation',
                   sender='techyintelo@gmail.com',

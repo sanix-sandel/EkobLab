@@ -1,0 +1,10 @@
+Dear {{ user.username }},
+Welcome to EKOB! you won't be disappointed.
+
+To confirm your account please click on the following link:
+
+{{ url_for('users.confirm', id=user.id, token=token, _external=True) }}
+
+Sincerely,
+
+EKOB Team.

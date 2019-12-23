@@ -38,9 +38,10 @@ class User(db.Model, UserMixin):
     aboutme=db.Column(db.Text, nullable=True)
     admin=db.Column(db.Boolean(), default=False)
     publisher=db.Column(db.Boolean(), default=False)
-    confirmed=db.Column(db.Boolean, default=False)
+    confirmed=db.Column(db.Boolean(), default=False)
     liked=db.relationship('PostLike', backref='liker', lazy='dynamic', cascade='all, delete-orphan')
     recommendations=db.relationship('Ebook', backref='recommender', lazy='dynamic', cascade='all, delete-orphan')
+   
     
     extend_existing=True
 
@@ -50,7 +51,7 @@ class User(db.Model, UserMixin):
         db.session.commit()
 
     def is_admin(self):
-        return self.admin
+        return self.admin         
 
     def is_publisher(self):
         return self.publisher    
@@ -64,7 +65,7 @@ class User(db.Model, UserMixin):
         s=Serializer(current_app.config['SECRET_KEY'], expiration)
         return s.dumps({'confirm':self.id}).decode('utf-8')
 
-
+    
     def confirm(self, token):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
@@ -259,10 +260,15 @@ class Tag(db.Model):
 
 class Notif(db.Model):
     id=db.Column(db.Integer(), primary_key=True)
+    title=db.Column(db.String(20))
     message=db.Column(db.Text())
 
+
+
     def __repr__(self):
-        return f"Notif('{self.message}')"         
+        return f"Notif(' : {self.message}')" 
+
+              
 
 class CKTextAreaWidget(widgets.TextArea):
     def __call__(self, field, **kwargs):

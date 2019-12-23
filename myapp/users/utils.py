@@ -1,7 +1,7 @@
 import os
 import secrets
 from PIL import Image
-from flask import url_for, current_app
+from flask import url_for, current_app, render_template
 from flask_mail import Message
 from myapp import mail
 
@@ -28,22 +28,14 @@ def send_reset_email(user):
                   recipients=[user.email])
     msg.body = f'''To reset your password, visit the following link:
     {url_for('users.reset_token', token=token, _external=True)}
-    If you did not make this request then simply ignore this email and no changes will be made.
+    If you didn't make this request then simply ignore this email and no changes will be made.
     '''
     mail.send(msg)
 
 
-   
 
-def email_confirmation(user):
-    token = user.generate_confirmation_token()
-    msg = Message('Registration Confirmation',
-                  sender='techyintelo@gmail.com',
-                  recipients=[user.email])
-    msg.body = f'''To confirm your regsitration , visit the following link:
-    {url_for('users.confirm', token=token, _external=True)}
-    If you did not make this request then simply ignore this email and no changes will be made.
-    '''
-    mail.send(msg)
-
-
+def send_email(to, subject, template, **kwargs):
+    msg=Message(subject, sender='techyintelo@gmail.com', recipients=[to])
+    msg.body=render_template(template+'.txt', **kwargs)
+    msg.html=render_template(template+'.html', **kwargs)
+    mail.send(msg)   

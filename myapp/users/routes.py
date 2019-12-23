@@ -4,7 +4,7 @@ from myapp import db, bcrypt
 from myapp.models import User, Post
 from myapp.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm)
-from myapp.users.utils import save_picture, send_reset_email, email_confirmation
+from myapp.users.utils import save_picture, send_reset_email, send_email
 from myapp import mail
 
 
@@ -19,12 +19,12 @@ def register():
     form=RegistrationForm()
     if form.validate_on_submit():#si il valide son enregistrement, ses donnnées sont envoyées à la DB
         hashed_password=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=False, publisher=False)
+        user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=False, publisher=False, )
         db.session.add(user)
         db.session.commit()
         token=user.generate_confirmation_token()
-        email_confirmation(user)
-        flash('A confirmation email has been sent to you by email !', 'success')
+        send_email(user.email,'Confirm your Account', 'registration_confirmation', user=user, token=token)
+        flash('A confirmation mail has been sent to you ! Check your mail box and confirm your account please !', 'success')
         return redirect(url_for('users.login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -39,7 +39,7 @@ def login():
         user=User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             if not user.confirmed:
-                flash(''+user.username +' You have to confirm your mail account please', 'danger')
+                flash(''+user.username +' You have to confirm your mail account please, check your mail box, and click on the link provided. thank you', 'danger')
                 return redirect(url_for('users.login'))
              #alors on active le remember me, et ensuite on le renvoie a la prochaine page get by request
             flash('Welocome back '+user.username+'', 'success')
@@ -130,15 +130,17 @@ def reset_token(token):
 
 
 
-@users.route("/confirm/<token>")
-@login_required
-def confirm(token):
-    if current_user.confirmed:
+@users.route("/confirm/<int:id>/<token>")
+def confirm(id, token):
+    user=User.query.get_or_404(id)
+    if user.confirmed:
         return redirect(url_for('main.home'))
-    if current_user.confirm(token):
+    if user.confirm(token):
+        
         db.session.commit()
         flash('You have confirmed your account, thank you !')
          
     else:
         flash('The confirmation link is invalid or has expired')
+      
     return redirect(url_for('main.home'))              
