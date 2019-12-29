@@ -17,7 +17,7 @@
         {% if post.author==current_user %}
           <div class="dropdown">
             <button class="btn btn-link dropdown-toggle" type="button" id="gedf-drop1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-ellipsis-h"></i>
+              <i class="fa fa-ellipsis-h"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop1">
                 <div class="h6 dropdown-header">Configuration</div>
@@ -47,7 +47,13 @@
       <a href="{{url_for('posts.like_action', post_id=post.id, action='like')}}" class="card-link"><i class="fa fa-gittip"></i> ({{post.nbrlikes}})Like</a>
       
       <a href="#" class="card-link"><i class="fa fa-comment"></i> ({{post.nbcomments}})Comment</a>
-      <a href="#" class="card-link"><i class="fa fa-mail-forward"></i> Share</a>
+      <i>Share</i>
+      <div class="dropdown">
+        <i class="dropbtn" ><i class="fa fa-mail-forward"></i></i>
+        <div class="dropdown-content">
+          {{ share.create(title='Share with: ') }}
+        </div>
+      </div>
     </div>
   </div>
 </article>

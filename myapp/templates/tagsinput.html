@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+<title>Tags input</title>
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/tagmanager/3.0.2/tagmanager.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tagmanager/3.0.2/tagmanager.min.js"></script>
+
+{% block content %}
+
+<div> <!--POur les tags-->
+    {% for tag in tags -%}
+      <a href="{{url_for('posts.tagpick', tag_id=tag.id,post_id=post.id)}}"><span class="badge badge-primary">{{ tag.title }}</span></a>
+    {% endfor %}
+</div>
+
+{% endblock content %}

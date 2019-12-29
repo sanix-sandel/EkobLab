@@ -32,6 +32,7 @@ class User(db.Model, UserMixin):
     location=db.Column(db.String(30), nullable=True)  #ici
     member_since=db.Column(db.DateTime(), default=datetime.utcnow)
     notifs=db.relationship('Notif', secondary=notifs, backref=db.backref('user', lazy='dynamic'), lazy='dynamic')
+    nbrnotifs=db.Column(db.Integer, default=0)
     comment=db.relationship('Comment', backref='author', lazy='dynamic', cascade='all, delete-orphan')
     reply=db.relationship('Reply', backref='author', lazy='dynamic', cascade='all, delete-orphan')
     files=db.relationship('File', backref='uploader',lazy='dynamic', cascade='all, delete-orphan')
@@ -78,10 +79,19 @@ class User(db.Model, UserMixin):
         db.session.add(self)
         return True
 
+    @property
+    def getnot(self):
+        return self.nbrnotifs
+
+    @getnot.setter
+    def getnot(self, n):
+        self.nbrnotifs=n        
+
     def has_liked_post(self, post):
         return PostLike.query.filter(
             PostLike.user_id == self.id,
             PostLike.post_id == post.id).count() > 0
+  
 
     def like_post(self, post):
         if not self.has_liked_post(post):
@@ -151,12 +161,12 @@ class Post(db.Model):
         self.nbrlikes=r        
 
     @like.setter
-    def dislike(self):
-        self.nbrlikes-=1     
+    def dislike(self, r):
+        self.nbrlikes=r     
 
     @property
     def nbrcomments(self):
-        self.nbcomments+=1
+        return self.nbcomments
 
     @nbrcomments.setter
     def nbrcomments(self, c):
@@ -179,7 +189,7 @@ class Comment(db.Model):
 
     @property
     def rep(self):
-        return self.rep
+        return self.nbrep
 
     @rep.setter
     def rep(self, rep):
@@ -201,7 +211,7 @@ class File(db.Model):
    
 
     id=db.Column(db.Integer, primary_key=True)
-    title=db.Column(db.String(40), nullable=False)   
+    title=db.Column(db.String(50), nullable=False)   
     date_posted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     data=db.Column(db.LargeBinary, nullable=False) 
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -278,6 +288,7 @@ class CKTextAreaWidget(widgets.TextArea):
 class CKTextAreaField(TextAreaField):
     widget=CKTextAreaWidget()        
 
+
 class MyAdminIndexView(AdminIndexView):
     @expose('/')
     def index(self):
@@ -304,7 +315,6 @@ class MyAdminIndexView(AdminIndexView):
     def logout(self):
         login.logout_user()
         return redirect(url_for('users.login'))
-
 
 class PostView(ModelView):
     form_overrides=dict(content=CKTextAreaField)
@@ -352,15 +362,16 @@ class TagView(ModelView):
 
 class NotifView(ModelView):
     column_searchable_list=('message',)
+    column_sortable_list=('title', 'message', 'user',)
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin                               
 
 class UserAdminView(ModelView):
     column_searchable_list=('username',)
-    column_sortable_list = ('username', 'admin', 'email', 'location','aboutme', 'confirmed',)
+    column_sortable_list = ('username', 'admin', 'email', 'location', 'confirmed', 'notifs.message',)
     column_exclude_list = ('password',)
     form_excluded_columns = ('password',)
-    form_edit_rules = ('username', 'admin', 'email', 'location', 'aboutme', 'publisher', 'confirmed')
+    form_edit_rules = ('username', 'admin', 'email', 'location', 'notifs', 'publisher', 'confirmed',)
     form_create_rules=('username', 'email', 'admin', 'location', 'aboutme')
 
     def is_accessible(self):

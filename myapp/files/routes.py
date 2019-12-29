@@ -18,7 +18,7 @@ from datetime import datetime
 files=Blueprint('files', __name__)
 
 
-ALLOWED_EXTENSIONS=set(['pdf'])
+ALLOWED_EXTENSIONS=set(['pdf', 'epub'])
 EXTENSIONS_ALLOWED=set(['jpeg', 'png', 'jpg'])
 
 def allowed_file(filename):
@@ -65,16 +65,19 @@ def upload():
          
     #if form.is_submitted():
         else:
+            if form.validate_on_submit():
 
-            flash('Your file has been successfully uploaded !', 'succes')
+
+                flash('Your file has been successfully uploaded !', 'succes')
             
-            newFile=File(title=form.title.data.capitalize(), data=file.read(), description=form.description.data, uploader=current_user, downloaded=0)
-            cover=Cover(file=newFile, data=cover.read())
-            db.session.add(cover)
-            db.session.commit()  
-            newFile.img_id=cover.id
-            db.session.add(newFile)
-            db.session.commit()  
+                newFile=File(title=form.title.data.capitalize(), data=file.read(), description=form.description.data, uploader=current_user, downloaded=0)
+                cover=Cover(file=newFile, data=cover.read())
+                db.session.add(cover)
+                db.session.commit()  
+                newFile.img_id=cover.id
+                db.session.add(newFile)
+                db.session.commit() 
+                return redirect(url_for('files.allfiles')) 
               
     return render_template("fileupload.html", form=form)
 
@@ -102,28 +105,32 @@ def uploadv(recommender_id):
          
     #if form.is_submitted():
         else:
+            if form.validate_on_submit():
+                flash('Your file has been successfully uploaded !', 'succes')
+                flash('thank You very much, Keep helping the biblio grow', 'succes')
             
-            flash('Your file has been successfully uploaded !', 'succes')
-            flash('thank You very much, Keep helping the biblio grow', 'succes')
+                newFile=File(title=form.title.data.capitalize(), data=file.read(), description=form.description.data, uploader=current_user, downloaded=0)
+                cover=Cover(file=newFile, data=cover.read())
+                db.session.add(cover)
+                db.session.commit()  
+                newFile.img_id=cover.id
+                db.session.add(newFile)
+                db.session.commit() 
             
-            newFile=File(title=form.title.data.capitalize(), data=file.read(), description=form.description.data, uploader=current_user, downloaded=0)
-            cover=Cover(file=newFile, data=cover.read())
-            db.session.add(cover)
-            db.session.commit()  
-            newFile.img_id=cover.id
-            db.session.add(newFile)
-            db.session.commit() 
-            recommender=[]
 
-            msg = Message('E-Books Recommendation',
-                  sender='techyintelo@gmail.com',
-                  recipients=[recommender.email])
-            msg.body = f'''Woopi ! the ebook you needed has been uploaded by a volunteer ! You can check it out 
-            If you did not make this request then simply ignore this email and no changes will be made.
-            TechyB Team.
+                msg = Message('E-Books Recommendation',
+                    sender='techyintelo@gmail.com',
+                    recipients=[recommender.email])
+                msg.body = f'''Woopi ! the ebook you needed has been uploaded by a volunteer ! You can check it out 
+                If you did not make this request then simply ignore this email and no changes will be made.
+                TechyB Team.
                 '''
-            mail.send(msg)
-
+                mail.send(msg)
+                notif=Notif.query.filter_by(title='EbookUploaded').first()
+                recommender.notifs.append(notif)
+                recommender.getnot+=1
+                db.session.commit()
+                return redirect(url_for('files.allfiles')) 
               
     return render_template("fileupload2.html", form=form)
 

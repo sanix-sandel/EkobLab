@@ -126,11 +126,12 @@ a.article-title:hover {
 }
 
 
+
 .cover{
-  height: 175px;
-  width: 175px;
+  height: 200px;
+  width: 250px;
   margin-right: 20px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .footer {
