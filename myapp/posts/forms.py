@@ -7,6 +7,8 @@ import bleach
 
 class PostForm(FlaskForm):
     title=StringField('Title/Titre', validators=[DataRequired(), Length(min=5, max=50)])
-    
     submit=SubmitField('Continuer')
     
+class TagForm(FlaskForm):
+    title=StringField('', validators=[DataRequired(), Length(min=2, max=20)]) 
+    submit=SubmitField('validate')   

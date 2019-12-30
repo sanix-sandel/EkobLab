@@ -3,7 +3,7 @@ from flask import (render_template, url_for, flash,
 from flask_login import current_user, login_required
 from myapp import db
 from myapp.models import Post, Comment, Tag, Reply
-from myapp.posts.forms import PostForm
+from myapp.posts.forms import PostForm, TagForm
 from myapp.comments.forms import CommentForm
 import bleach
 from flask import Markup
@@ -47,13 +47,29 @@ def Newpost(title):
     return render_template('new_post.html', title='New Post', tags=tags)
 
 
-
 @posts.route("/post/newpost/<int:post_id>/tagsinput", methods=['GET', 'POST'])
 @login_required
 def tagin(post_id):
+    form=TagForm()
     tags=Tag.query.all()
     post=Post.query.get_or_404(post_id)
-    return render_template('tagsinput.html', tags=tags, post=post)
+    if form.validate_on_submit():
+        flash('Thank you very much '+current_user.username+' !', 'success')
+        titles=form.title.data
+        return redirect(url_for('posts.tagpicked', post_id=post.id, titles=titles))
+    return render_template('tagsinput.html', form=form, tags=tags, post=post)
+
+
+@posts.route("/post/newpost/<int:post_id>/tagsinput/main", methods=['GET', 'POST'])
+@login_required
+def tagpicked(post_id, titles):
+    for title in titles:
+        title=title.capitalize()
+        if Tag.query.filter_by(title=title).count()==1:
+            tag=Tag.query.filter_by(title=title).first()
+            post.tags.append(tag)
+            db.session.commit()
+    return redirect(url_for('main.home'))
 
 
 @posts.route("/post/newpost/<int:post_id>/tagsinput/<int:tag_id>", methods=['GET', 'POST'])
@@ -85,7 +101,6 @@ def post(post_id):
     return render_template('post.html', title=post.title, post=post, rposts=rposts, comments=comments)
                                                   
 
-
 @posts.route("/post/<int:post_id>/comment", methods=['GET', 'POST'])
 @login_required
 def commenter(content, post_id):
@@ -98,7 +113,6 @@ def commenter(content, post_id):
     flash('Your comment has been added', 'success')
     return redirect (url_for('posts.post', post_id=post.id))
    
-
 
 @posts.route("/post/<int:post_id>/<int:comment_id>/reply", methods=['GET', 'POST'])
 @login_required
@@ -117,7 +131,6 @@ def reply(comment_id, post_id):
     else:    
         flash('The reply has no content ', 'danger')
     return redirect (url_for('main.home'))
-
 
 
 @posts.route("/post/<int:post_id>/delete", methods=['POST'])
@@ -142,8 +155,6 @@ def update_post(post_id):
     return render_template('postupdate.html', post=post)
    
 
-
-
 @posts.route('/like/<int:post_id>/<action>')
 @login_required
 def like_action(post_id, action):
@@ -158,21 +169,7 @@ def like_action(post_id, action):
             post.like+=1
             db.session.commit()   
         return redirect(url_for('posts.post', post_id=post.id))         
-        """
-        if not current_user.has_liked_post(post): 
-            current_user.like_post(post)
-        
-            post.like+=1
-            db.session.commit()
-        else:
-            post.like-=1    
-            db.session.commit()  
-        if current_user.has_disliked_post(post):
-            current.user.like_post(post)
-            post.like-=1
-            db.session.commit()   """  
-   
-
+       
 
 @posts.route('/post/<int:tag_id>/')
 def tag_posts(tag_id):
