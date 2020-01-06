@@ -1,7 +1,26 @@
 {% extends "layout.html" %}
 {% block content %}
 
-{% for file in files.items %}
+
+
+<article class="media content-section">
+  
+  <div class="media-body">
+   
+    <div class="article-metadata">
+      
+      <div> 
+        {% for genre in genres %}
+        <a href="{{url_for('files.files_bygenre', category=genre.title)}}"><span class="badge badge-primary">{{ genre.title }} </span></a>
+        {% endfor %}
+      </div>
+    </div>
+    
+  </div>
+</article>
+
+<!--
+    {% for file in files.items %}
         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + file.uploader.image_file) }}">
           <div class="media-body">
@@ -16,6 +35,37 @@
           </div>
         </article>
     {% endfor %}
+-->
+
+    
+
+
+    <div class="container">
+      {% for file in files.items %}
+        <div class="row">
+          
+            <div class="col-sm-4 py-2">
+              <div class="card h-100 text-white bg-danger">
+                
+                  <div class="card-body">
+                    
+                      <a href="{{ url_for('files.file', file_id=file.id) }}" class="article-title">
+                        <h3 class="card-title">{{file.title}}</h3>
+                      </a>
+                      <div class="imagecover">
+                        <img class="cover" src="{{url_for('files.serve_image', img_id=file.img_id)}}">
+                      </div> 
+                      <p class="card-text">{{file.description}}</p>
+                      <a href="{{ url_for('files.file', file_id=file.id) }}" class="btn btn-outline-light">Outline</a>
+                     
+                  </div>
+                
+              </div>
+            </div>
+          
+      {% endfor %}   
+        </div>
+    </div>  
     {% for page_num in files.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
       {% if page_num %}
         {% if files.page == page_num %}
@@ -27,5 +77,6 @@
         ...
       {% endif %}
     {% endfor %}
+
 
 {% endblock content %}

@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+
+ 
+ 
+{% block content %}
+
+     
+<form method="POST" action="">
+  {{ form.hidden_tag() }}
+  <fieldset class="form-group">
+      
+      <div class="form-group">
+          
+          {% if form.search.errors %}
+              {{ form.search(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                  {% for error in form.search.errors %}
+                      <span>{{ error }}</span>
+                  {% endfor %}
+              </div>
+          {% else %}
+              {{ form.search(class="form-control form-control-lg") }}
+          {% endif %}
+      </div>
+  </fieldset>
+  <div class="form-group">
+    {{ form.submit(class="btn btn-outline-info") }}
+    
+  </div>  
+</form>  
+
+
+<article class="media content-section">
+  
+  <div class="media-body">
+   
+    <div class="article-metadata">
+      
+      <div> <!--POur les tags-->
+        {% for genre in genres %}
+          <a href="{{url_for('files.files_bygenre', category=genre.title)}}"><span class="badge badge-primary">{{ genre.title }}</span> </a>
+        {% endfor %}  
+      </div>
+      <h1>{{genre.title}}</h1>  
+    </div>
+    
+  </div>
+</article>
+
+
+<!--
+{% for file in files.items %}
+    <article class="media content-section">
+      <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + file.uploader.image_file) }}">
+      <div class="media-body">
+        <div class="article-metadata">
+         <a class="mr-2" >{{ file.uploader.username }}</a>
+          <small class="text-muted">{{ file.date_posted.strftime('%Y-%m-%d') }}</small>
+          <small class="text-muted">{{ file.uploader.location }}</small>
+        </div>
+        <h2><a class="article-title" href="{{ url_for('files.file', file_id=file.id) }}">{{ file.title }}</a></h2>
+        
+        <p class="article-content">{{ file.description[:30]|safe}} <a href="{{url_for('files.file', file_id=file.id)}}">Read more...</a></p>
+      </div>
+    </article>
+{% endfor %}
+-->
+
+
+    <div class="container">
+      {% for file in files.items %}
+        <div class="row">
+          
+          <div class="col-sm-4 py-2">
+              <div class="card h-100 text-white bg-danger">
+                  <div class="card-body">
+                    <a href="{{ url_for('files.file', file_id=file.id) }}" class="article-title">
+                      <h3 class="card-title">{{file.title}}</h3>
+                    </a>  
+                      <div class="imagecover">
+                        <img class="cover" src="{{url_for('files.serve_image', img_id=file.img_id)}}">
+                      </div>
+                      <p class="card-text">{{file.description[:25]}}</p>
+                      <a href="#" class="btn btn-outline-light">Outline</a>
+                  </div>
+              </div>
+          </div>
+      {% endfor %}   
+        </div>
+    </div>  
+    {% for page_num in files.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+      {% if page_num %}
+        {% if files.page == page_num %}
+          <a class="btn btn-info mb-4" href="{{ url_for('files.allfiles', page=page_num) }}">{{ page_num }}</a>
+        {% else %}
+          <a class="btn btn-outline-info mb-4" href="{{ url_for('files.allfiles', page=page_num) }}">{{ page_num }}</a>
+        {% endif %}
+      {% else %}
+        ...
+      {% endif %}
+    {% endfor %}    
+  
+{% endblock content %}

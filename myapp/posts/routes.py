@@ -2,12 +2,13 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint)
 from flask_login import current_user, login_required
 from myapp import db
-from myapp.models import Post, Comment, Tag, Reply
+from myapp.models import Post, Comment, Tag, Reply, Genre
 from myapp.posts.forms import PostForm, TagForm
 from myapp.comments.forms import CommentForm
 import bleach
 from flask import Markup
 from flask import send_from_directory
+from myapp.files.forms import SearchForm
 
 posts=Blueprint('posts', __name__)
 
@@ -15,30 +16,33 @@ posts=Blueprint('posts', __name__)
 @posts.route("/post/newpost", methods=['GET', 'POST'])
 @login_required
 def new_post():
-    if not current_user.is_publisher:
+    if not current_user.is_publisher():
         flash('If you want to make post, fisrtly contact the EkoB team. thank you', 'success')
         return redirect(url_for('main.home'))
     form=PostForm()
     if form.validate_on_submit():
         title=form.title.data
+        title=title.capitalize()
+        genre=form.genre.data
         
         flash('Your Post need a content!', 'succes')
-        return redirect(url_for('posts.Newpost', title=title))   
+        return redirect(url_for('posts.Newpost', title=title, category=genre.title))   
     return render_template('create_post.html', form=form, title='New Post', legend='New post')
 
 
-@posts.route("/post/newpost/<string:title>", methods=['GET', 'POST'])
+@posts.route("/post/newpost/<string:title>/<string:category>", methods=['GET', 'POST'])
 @login_required
-def Newpost(title):
+def Newpost(title, category):
     tags=Tag.query.all()
+    
     if request.method=='POST':
         content=request.form.get('postcontent')
         if content=="":
             flash('The post must have a content', 'danger')
             return redirect(url_for('main.home'))
         else:    
-            post=Post(title=title, content=content, author=current_user)
-        
+            post=Post(title=title, content=content, author=current_user, category=category)
+              
             db.session.add(post)
             db.session.commit()
            
@@ -60,9 +64,11 @@ def tagin(post_id):
     return render_template('tagsinput.html', form=form, tags=tags, post=post)
 
 
-@posts.route("/post/newpost/<int:post_id>/tagsinput/main", methods=['GET', 'POST'])
+@posts.route("/post/newpost/<int:post_id>/tagsinput/<string:titles>", methods=['GET', 'POST'])
 @login_required
 def tagpicked(post_id, titles):
+    post=Post.query.get_or_404(post_id)
+    titles=titles.split()
     for title in titles:
         title=title.capitalize()
         if Tag.query.filter_by(title=title).count()==1:
@@ -81,6 +87,7 @@ def tagpick(post_id, tag_id):
     db.session.commit()
     return redirect(url_for('posts.tagin', post_id=post.id))
 
+
 @posts.route("/post/<int:post_id>", methods=['GET', 'POST'])
 @login_required
 def post(post_id):
@@ -91,7 +98,7 @@ def post(post_id):
     comments= Comment.query.filter_by(post_id=post_id)\
         .order_by(Comment.date_posted.desc())\
         .all()
-    rposts=Post.query.filter(Post.id != post.id ).filter_by(genre=post.genre).limit(5).all()
+    rposts=Post.query.filter(Post.id != post.id ).filter_by(category=post.category).limit(5).all()
     if request.method=="POST":
         content=request.form.get('comment')
         
@@ -151,8 +158,46 @@ def update_post(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author != current_user:
         abort(403)
-        
+    if request.method=='POST':
+   
+        content=request.form.get('postcontent')
+        if len(content)<0:
+            flash('A post must have at least 300 words', 'danger')
+            return redirect(url_for('main.home'))
+
+    
+        post.content=content
+        db.session.commit()
+        flash('Your post has been updated', 'success')
+        return redirect(url_for('main.home'))
+    else:
+        flash('Post not updated', 'danger')
+
+           
     return render_template('postupdate.html', post=post)
+
+
+
+@posts.route("/post/<int:post_id>/updated", methods=['GET', 'POST'])
+@login_required
+def updatedpost(post_id):
+    post = Post.query.get_or_404(post_id)
+    if request.method=='POST':
+   
+        content=request.form.get('postcontent')
+        if len(content)<0:
+            flash('A post must have at least 300 words', 'danger')
+            return redirect(url_for('main.home'))
+
+    
+        post.content=content
+        db.session.commit()
+        flash('Your post has been updated', 'success')
+        return redirect(url_for('main.home'))
+    else:
+        flash('Post not updated', 'danger')
+
+        return redirect(url_for('main.home'))
    
 
 @posts.route('/like/<int:post_id>/<action>')
@@ -177,3 +222,18 @@ def tag_posts(tag_id):
     page = request.args.get('page', 1, type=int)
     posts=tag.posts.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
     return render_template('tag_posts.html', posts=posts)
+
+
+@posts.route('/<string:category>')
+def posts_bygenre(category):
+    form=SearchForm()
+    page = request.args.get('page', 1, type=int)
+    genre=Genre.query.filter_by(title=category).first()
+    posts=Post.query.filter_by(category=genre.title)\
+        .order_by(Post.date_posted.desc())\
+        .paginate(page=page, per_page=5)
+
+    genres=Genre.query.all()
+    return render_template('posts_bygenre.html', genre=genre, posts=posts, genres=genres, form=form)    
+
+        

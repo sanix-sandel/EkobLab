@@ -18,7 +18,7 @@ def register():
     form=RegistrationForm()
     if form.validate_on_submit():#si il valide son enregistrement, ses donnnées sont envoyées à la DB
         hashed_password=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=True, publisher=False, )
+        user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=True, publisher=True )
         db.session.add(user)
         db.session.commit()
         token=user.generate_confirmation_token()
@@ -91,7 +91,7 @@ def user_posts(username):
     posts=Post.query.filter_by(author=user)\
         .order_by(Post.date_posted.desc())\
         .paginate(page=page, per_page=5)
-    return render_template('user_posts.html', posts=posts,user=user)    
+    return render_template('user_posts.html', posts=posts, user=user)    
 
 
 

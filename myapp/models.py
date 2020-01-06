@@ -17,8 +17,8 @@ def load_user(user_id):
 
 
 notifs=db.Table('user_notifs',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('notif_id', db.Integer, db.ForeignKey('notif.id'))
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), nullable=True),
+    db.Column('notif_id', db.Integer, db.ForeignKey('notif.id'), nullable=True)
 
 )
 
@@ -35,14 +35,14 @@ class User(db.Model, UserMixin):
     nbrnotifs=db.Column(db.Integer, default=0)
     comment=db.relationship('Comment', backref='author', lazy='dynamic', cascade='all, delete-orphan')
     reply=db.relationship('Reply', backref='author', lazy='dynamic', cascade='all, delete-orphan')
-    files=db.relationship('File', backref='uploader',lazy='dynamic', cascade='all, delete-orphan')
+    files=db.relationship('File', backref='uploader',lazy='dynamic')
     aboutme=db.Column(db.Text, nullable=True)
     admin=db.Column(db.Boolean(), default=False)
     publisher=db.Column(db.Boolean(), default=False)
     confirmed=db.Column(db.Boolean(), default=False)
     liked=db.relationship('PostLike', backref='liker', lazy='dynamic', cascade='all, delete-orphan')
     recommendations=db.relationship('Ebook', backref='recommender', lazy='dynamic', cascade='all, delete-orphan')
-   
+    books=db.Column(db.Integer, default=0, nullable=True)
     
     extend_existing=True
 
@@ -87,12 +87,19 @@ class User(db.Model, UserMixin):
     def getnot(self, n):
         self.nbrnotifs=n        
 
+    @property
+    def getbooks(self):
+        return self.books
+
+    @getbooks.setter
+    def getbooks(self, n):
+        self.books=n    
+
     def has_liked_post(self, post):
         return PostLike.query.filter(
             PostLike.user_id == self.id,
             PostLike.post_id == post.id).count() > 0
   
-
     def like_post(self, post):
         if not self.has_liked_post(post):
             like = PostLike(user_id=self.id, post_id=post.id)
@@ -118,20 +125,21 @@ class User(db.Model, UserMixin):
 
 
 tags=db.Table('post_tags',
-    db.Column('post_id', db.Integer, db.ForeignKey('post.id')),
-    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
+    db.Column('post_id', db.Integer, db.ForeignKey('post.id'), nullable=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), nullable=True)
 
 )
+
 
 
 class Post(db.Model):
    
     id=db.Column(db.Integer, primary_key=True)
-    title=db.Column(db.String(50), nullable=False)   
+    title=db.Column(db.String(150), nullable=False)   
     date_posted=db.Column(db.DateTime(), nullable=False, index=True, default=datetime.utcnow)
     content=db.Column(db.UnicodeText, nullable=False) 
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    genre=db.Column(db.String(20), nullable=False, default='chat')
+    category=db.Column(db.String(20), nullable=False)
     comment=db.relationship('Comment', backref='post_comments', lazy='dynamic', cascade='all, delete-orphan')
     tags=db.relationship('Tag', secondary=tags, backref=db.backref('posts', lazy='dynamic'), lazy='dynamic')
     reads=db.Column(db.Integer, default=0)
@@ -172,10 +180,18 @@ class Post(db.Model):
     def nbrcomments(self, c):
         self.nbcomments=c
        
-    
-
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
+
+
+
+class Genre(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    title=db.Column(db.String(20), nullable=False)
+
+    def __repr__(self):
+        return f"Genre ('{self.title}')"
+
 
 
 class Comment(db.Model):
@@ -211,15 +227,17 @@ class File(db.Model):
    
 
     id=db.Column(db.Integer, primary_key=True)
-    title=db.Column(db.String(50), nullable=False)   
+    title=db.Column(db.String(150), nullable=False)   
     date_posted=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     data=db.Column(db.LargeBinary, nullable=False) 
-    user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     description=db.Column(db.String(500), nullable=False)
+    category=db.Column(db.String(20), nullable=False)
     cover=db.relationship('Cover', backref='file', lazy='dynamic', cascade='all, delete-orphan')
     downloaded=db.Column(db.Integer, default=0)
     _img_id=db.Column(db.Integer, default=0)
     img_id=_img_id
+    file_size=db.Column(db.Float, nullable=True)
 
     extend_existing=True
 
@@ -359,6 +377,11 @@ class TagView(ModelView):
     column_searchable_list=('title',)
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin  
+        
+
+class GenreView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin
 
 class NotifView(ModelView):
     column_searchable_list=('message',)
@@ -395,3 +418,5 @@ admin.add_view(CoverView(Cover, db.session))
 admin.add_view(TagView(Tag, db.session))
 
 admin.add_view(NotifView(Notif, db.session))
+
+admin.add_view(GenreView(Genre, db.session))

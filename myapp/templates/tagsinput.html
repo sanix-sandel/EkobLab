@@ -18,7 +18,7 @@
         
         
 <div class="content-section">   
-  <form method="POST" action="{{ url_for('posts.tagpicked', post_id=post.id, titles=titles)}}">   
+  <form method="POST" action="{{ url_for('posts.tagin', post_id=post.id)}}">   
   {{ form.hidden_tag() }}
   <fieldset class="form-group">
       <legend class="border-bottom mb-4">{{ legend }}</legend>

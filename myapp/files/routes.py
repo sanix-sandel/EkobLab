@@ -2,7 +2,7 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint, request, send_file, Response, g, current_app)
 from flask_login import current_user, login_required
 from myapp import db
-from myapp.models import File, Ebook, Cover, User, Notif
+from myapp.models import File, Ebook, Cover, User, Notif, Genre
 from myapp.files.forms import FileForm, EbookForm, SearchForm
 import bleach
 from io import BytesIO
@@ -11,6 +11,7 @@ from flask_mail import Message
 from myapp import mail
 from sqlalchemy.orm.util import join
 from datetime import datetime
+import os
 
 
 
@@ -32,8 +33,9 @@ def file_allowed(filename):
 @files.route("/files", methods=['GET', 'POST'])
 def allfiles():
     page = request.args.get('page', 1, type=int)
-    files = File.query.order_by(File.date_posted.desc()).paginate(page=page, per_page=5)
-    return render_template('files.html', files=files)
+    files = File.query.order_by(File.date_posted.desc()).paginate(page=page, per_page=12)
+    genres=Genre.query.all()
+    return render_template('files.html', files=files, genres=genres)
 
 
 @files.route('/img/<int:img_id>', methods=['GET', 'POST'])
@@ -69,8 +71,13 @@ def upload():
 
 
                 flash('Your file has been successfully uploaded !', 'succes')
-            
-                newFile=File(title=form.title.data.capitalize(), data=file.read(), description=form.description.data, uploader=current_user, downloaded=0)
+                
+                file.seek(0, os.SEEK_END)
+                file_length=file.tell()
+                category=form.genre.data
+                newFile=File(title=form.title.data.capitalize(), data=file.read(), 
+                    description=form.description.data, uploader=current_user, downloaded=0,
+                     file_size=(file_length/1000), category=category.title)
                 cover=Cover(file=newFile, data=cover.read())
                 db.session.add(cover)
                 db.session.commit()  
@@ -108,10 +115,15 @@ def uploadv(recommender_id):
             if form.validate_on_submit():
                 flash('Your file has been successfully uploaded !', 'succes')
                 flash('thank You very much, Keep helping the biblio grow', 'succes')
-            
-                newFile=File(title=form.title.data.capitalize(), data=file.read(), description=form.description.data, uploader=current_user, downloaded=0)
+                file.seek(0, os.SEEK_END)
+                file_length=file.tell()
+                category=form.genre.data
+                newFile=File(title=form.title.data.capitalize(), data=file.read(), 
+                    description=form.description.data, uploader=current_user, downloaded=0,
+                    file_size=(file_length/1000), category=category.title)
                 cover=Cover(file=newFile, data=cover.read())
                 db.session.add(cover)
+                current_user.getbooks+=1
                 db.session.commit()  
                 newFile.img_id=cover.id
                 db.session.add(newFile)
@@ -157,7 +169,7 @@ def recommend():
     form=EbookForm()
     if form.validate_on_submit():
         flash("Your recommendation is received, we'll reply soon", 'success')
-        ebook=Ebook(title=form.title.data, author=form.author.data, recommender=current_user)
+        ebook=Ebook(title=form.title.data.capitalize(), author=form.author.data, recommender=current_user)
         db.session.add(ebook)
         db.session.commit()
         msg = Message('E-Books Recommendation',
@@ -179,13 +191,20 @@ def ebooks():
     page = request.args.get('page', 1, type=int)
     ebooks = Ebook.query.order_by(Ebook.date_posted.desc()).paginate(page=page, per_page=5)
     return render_template('Ebooks.html', ebooks=ebooks)
-"""
-@files.route('/home/search')
-def getit():
-    if request.method=='POST':
-        nums=min(request.args.get('limit', 10), 50)
-        query=request.args.get('searched', '')
-        results=File.query.Search(query, limit=nums)
-        return render_template('search.html', results=results)
-    else:
-        None    """
+
+
+@files.route('/home/files/<string:category>')
+def files_bygenre(category):
+    form=SearchForm()
+    page = request.args.get('page', 1, type=int)
+    genre=Genre.query.filter_by(title=category).first()
+    genres=Genre.query.all()
+    files=File.query.filter_by(category=genre.title)\
+        .order_by(File.date_posted.desc())\
+        .paginate(page=page, per_page=5)
+    return render_template('files_bygenre.html', files=files, genre=genre, form=form, genres=genres)
+
+
+
+
+

@@ -13,6 +13,10 @@ body {
 }
 
 
+.mb-3{
+  background-color: white;
+}
+
 h1, h2, h3, h4, h5, h6 {
   color: black;
   font-family: sans-serif;
@@ -125,13 +129,16 @@ a.article-title:hover {
   font-size: 2.5rem;
 }
 
-
+.card-body{
+  background-color:grey;
+  
+}
 
 .cover{
-  height: 200px;
-  width: 250px;
+  height: 125px;
+  width: 125px;
   margin-right: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .footer {
@@ -151,6 +158,8 @@ a.article-title:hover {
   display: inline-block;
   vertical-align: top;
 }
+
+
 /* search box */
 
 
@@ -226,6 +235,7 @@ a.article-title:hover {
 .footer .icons {
   margin-top: 25px;
 }
+
 
 .footer .icons a {
   display: inline-block;

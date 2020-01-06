@@ -6,6 +6,8 @@
 
 
 
+
+
 <article class="media content-section">
   <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
   <div class="media-body">
@@ -15,17 +17,15 @@
       <small class="text-muted">{{ post.author.location }}</small>
       <div>
         {% if post.author==current_user %}
-          <div class="dropdown">
-            <button class="btn btn-link dropdown-toggle" type="button" id="gedf-drop1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-ellipsis-h"></i>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop1">
-                <div class="h6 dropdown-header">Configuration</div>
-                <a class="dropdown-item" href="{{ url_for('posts.update_post', post_id=post.id) }}">Update</a>
-                <a class="dropdown-item" href="#">Hide</a>
-                <a class="dropdown-item" href="#">Report</a>
-            </div>
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOption"><span class="glyphicon glyphicon-th-list">
+            </span class="ecrits">Options</a>
+          </p> 
+          <div id="collapseOption" class="panel-collapse collapse">
+            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.update_post', post_id=post.id) }}">Update</a>
+            <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
           </div>
+          
         {% endif %}
       </div>
     </div>
@@ -70,7 +70,7 @@
           </button>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
           <form action="{{ url_for('posts.delete_post', post_id=post.id) }}" method="POST">
             <input class="btn btn-danger" type="submit" value="Delete">
           </form>
@@ -83,11 +83,23 @@
   <!-- CommentForm and comments section here -->
   <form method="post">
     
-    <textarea id="comment" name="comment"></textarea>
+   
                                 <!--le lien pour-->
    <!-- <a href="{{url_for('posts.commenter', post_id=post.id)}}">-->
-    <input type="submit" class="btn" value="comment">
+    
     <!--</a>-->
+
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="comment">Your Comment:</label>
+      <div class="col-sm-10">
+        <textarea class="form-control" rows="5" id="comment" id="comment" name="comment"></textarea>
+      </div>
+    </div>
+    <div class="form-group">        
+      <div class="col-sm-offset-2 col-sm-10">
+        <input type="submit" class="btn" value="comment">
+      </div>
+    </div>
   </form>
 
 {% endif %}  
@@ -156,7 +168,7 @@
         </div>
     </div>
 </div>
- 
+
   <h2 class="ecrits">Related Posts </h2>
   
   {% for pots in rposts %}
@@ -169,10 +181,11 @@
           <small class="text-muted">{{ pots.author.location }}</small>
         </div>
         <h2><a class="article-title" href="{{ url_for('posts.post', post_id=pots.id) }}">{{ pots.title }}</a></h2>
-        <!--<p class="article-content">{{ pots.content[:120]|safe}} </p>-->
+       
       </div>
     </article>
 {% endfor %}
+  
 {{ share.create(title='Share with: ') }}
 
 {% endblock %}

@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content%}
+{{ share.load() }}
 
 <article class="media content-section">
     <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + file.uploader.image_file) }}">
@@ -21,9 +22,9 @@
 </article>
   
   <a href="{{url_for('files.download', file_id=file_id)}}">
-   <button class="btn"><i class="fa fa-download"></i> Download </button>
+   <button class="btn"><i class="fa fa-download"></i> Download {{ file.file_size }} MB </button>
   </a>
 
-  
+  {{ share.create(title='Share with: ') }}  
 
 {% endblock content %}
