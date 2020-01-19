@@ -14,8 +14,6 @@ from datetime import datetime
 import os
 
 
-
-
 files=Blueprint('files', __name__)
 
 
@@ -42,51 +40,42 @@ def allfiles():
 def serve_image(img_id):
     image=Cover.query.get_or_404(img_id)
     return image.data
-    
+
 
 
 @login_required
 @files.route('/home/upload', methods=['GET', 'POST'])
 def upload():
-    form=FileForm()
-    if request.method=='POST':
-
-        if 'file' not in request.files:
-            flash('No file part !')
-        file=request.files['file']
-
-        if file.filename=='':
-            flash('No file selected ', 'danger')
-            return redirect(request.url)    
-        if not allowed_file(file.filename):
-            flash('Only PDF files, please', 'danger')
-
-        cover=request.files['cover']
-        if not file_allowed(cover.filename):
-            flash('Only png, jpeg, jpg files allowed')
-         
+    form=FileForm()      
     #if form.is_submitted():
-        else:
-            if form.validate_on_submit():
-
-
-                flash('Your file has been successfully uploaded !', 'succes')
-                
-                file.seek(0, os.SEEK_END)
-                file_length=file.tell()
-                category=form.genre.data
-                newFile=File(title=form.title.data.capitalize(), data=file.read(), 
-                    description=form.description.data, uploader=current_user, downloaded=0,
-                     file_size=(file_length/1000), category=category.title)
-                cover=Cover(file=newFile, data=cover.read())
-                db.session.add(cover)
-                db.session.commit()  
-                newFile.img_id=cover.id
-                db.session.add(newFile)
-                db.session.commit() 
-                return redirect(url_for('files.allfiles')) 
+        
+    if form.validate_on_submit():
+        flash('Your file has been successfully uploaded !', 'succes')        
+        form.filedata.data.seek(0, os.SEEK_END)
+        file_length=str(form.filedata.data.tell()/1000)
+        file_length=str(file_length)
+        category=form.genre.data
+        newFile=File(title=form.title.data.capitalize(), data=form.filedata.data.read(), 
+            description=form.description.data, uploader=current_user, downloaded=0,
+            file_size=file_length, category=category.title)
+        cover=Cover(file=newFile, data=form.cover.data.read())
+        flash('Your file has been successfully uploaded', 'success')
+        db.session.add(cover)            
+        db.session.commit()  
+        objet.img_id=cover.id
+        db.session.add(newFile)
+        db.session.commit()
               
     return render_template("fileupload.html", form=form)
+
+"""
+db.session.add(cover)
+                c
+db.session.commit()  
+newFile.img_id=cover.id
+db.session.add(newFile)
+db.session.commit() 
+"""
 
 
 @login_required
@@ -116,11 +105,11 @@ def uploadv(recommender_id):
                 flash('Your file has been successfully uploaded !', 'succes')
                 flash('thank You very much, Keep helping the biblio grow', 'succes')
                 file.seek(0, os.SEEK_END)
-                file_length=file.tell()
+                file_length=str(file.tell()/1000)
                 category=form.genre.data
                 newFile=File(title=form.title.data.capitalize(), data=file.read(), 
                     description=form.description.data, uploader=current_user, downloaded=0,
-                    file_size=(file_length/1000), category=category.title)
+                    file_size=file_length, category=category.title)
                 cover=Cover(file=newFile, data=cover.read())
                 db.session.add(cover)
                 current_user.getbooks+=1
@@ -201,7 +190,7 @@ def files_bygenre(category):
     genres=Genre.query.all()
     files=File.query.filter_by(category=genre.title)\
         .order_by(File.date_posted.desc())\
-        .paginate(page=page, per_page=5)
+        .paginate(page=page, per_page=6)
     return render_template('files_bygenre.html', files=files, genre=genre, form=form, genres=genres)
 
 

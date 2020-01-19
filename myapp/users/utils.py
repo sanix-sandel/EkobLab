@@ -3,7 +3,8 @@ import secrets
 from PIL import Image
 from flask import url_for, current_app, render_template
 from flask_mail import Message
-from myapp import mail
+from myapp import mail, celery, create_app
+from myapp.tasks import send_email
 
 
 def save_picture(form_picture):
@@ -34,8 +35,13 @@ def send_reset_email(user):
 
 
 
-def send_email(to, subject, template, **kwargs):
+def msg_to_dict(to, subject, template, **kwargs):
     msg=Message(subject, sender='techyintelo@gmail.com', recipients=[to])
     msg.body=render_template(template+'.txt', **kwargs)
     msg.html=render_template(template+'.html', **kwargs)
-    mail.send(msg)   
+    return msg.__dict__ 
+
+
+
+def send_mail(to, subject, template, **kwargs):
+    send_email.delay(msg_to_dict(to, subject, template, **kwargs))

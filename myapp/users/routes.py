@@ -4,7 +4,7 @@ from myapp import db, bcrypt
 from myapp.models import User, Post
 from myapp.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm)
-from myapp.users.utils import save_picture, send_reset_email, send_email
+from myapp.users.utils import save_picture, send_reset_email, send_mail
 from myapp import mail
 
 
@@ -22,7 +22,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         token=user.generate_confirmation_token()
-        send_email(user.email,'Confirm your Account', 'registration_confirmation', user=user, token=token)
+        send_mail(user.email,'Confirm your Account', 'registration_confirmation', user=user, token=token)
         flash('A confirmation mail has been sent to you ! Check your mail box and confirm your account please !', 'success')
         return redirect(url_for('users.login'))
     return render_template('register.html', title='Register', form=form)
@@ -41,7 +41,7 @@ def login():
                 flash(''+user.username +' You have to confirm your mail account please, check your mail box, and click on the link provided. thank you', 'danger')
                 return redirect(url_for('users.login'))
              #alors on active le remember me, et ensuite on le renvoie a la prochaine page get by request
-            flash('Welocome back '+user.username+'', 'success')
+            flash('Welcome back '+user.username+'', 'success')
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.home'))#si il voulait se connecter à 
@@ -91,7 +91,16 @@ def user_posts(username):
     posts=Post.query.filter_by(author=user)\
         .order_by(Post.date_posted.desc())\
         .paginate(page=page, per_page=5)
-    return render_template('user_posts.html', posts=posts, user=user)    
+    return render_template('user_posts.html', posts=posts, user=user)  
+
+   
+@users.route("/user/notifications")
+@login_required
+def user_notifs():
+    notifs=current_user.notifs
+    current_user.getnot=0
+    db.session.commit()
+    return render_template('notifications.html', notifs=notifs)      
 
 
 

@@ -41,9 +41,9 @@
 
 
     <div class="container">
-      {% for file in files.items %}
+      
         <div class="row">
-          
+          {% for file in files.items %}
             <div class="col-sm-4 py-2">
               <div class="card h-100 text-white bg-danger">
                 
@@ -51,19 +51,21 @@
                     
                       <a href="{{ url_for('files.file', file_id=file.id) }}" class="article-title">
                         <h3 class="card-title">{{file.title}}</h3>
-                      </a>
+                      </a>                      
+                      
                       <div class="imagecover">
                         <img class="cover" src="{{url_for('files.serve_image', img_id=file.img_id)}}">
-                      </div> 
+                      </div>
+                        
                       <p class="card-text">{{file.description}}</p>
-                      <a href="{{ url_for('files.file', file_id=file.id) }}" class="btn btn-outline-light">Outline</a>
+                      
                      
                   </div>
                 
               </div>
             </div>
           
-      {% endfor %}   
+          {% endfor %}   
         </div>
     </div>  
     {% for page_num in files.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}

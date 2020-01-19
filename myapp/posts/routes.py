@@ -2,7 +2,7 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint)
 from flask_login import current_user, login_required
 from myapp import db
-from myapp.models import Post, Comment, Tag, Reply, Genre
+from myapp.models import Post, Comment, Tag, Reply, Genre, Notif
 from myapp.posts.forms import PostForm, TagForm
 from myapp.comments.forms import CommentForm
 import bleach
@@ -112,11 +112,16 @@ def post(post_id):
 @login_required
 def commenter(content, post_id):
     post=Post.query.get_or_404(post_id)
+    author=post.author
     comment=Comment(content=content, author=current_user, post_id=post_id )
     db.session.add(comment)
     db.session.commit()
     post.nbrcomments+=1
-    db.session.commit()
+    if not current_user==author:
+        notif=Notif.query.filter_by(title='PostCommented').first()
+        author.notifs.append(notif)
+        author.getnot+=1
+        db.session.commit()
     flash('Your comment has been added', 'success')
     return redirect (url_for('posts.post', post_id=post.id))
    
@@ -216,7 +221,7 @@ def like_action(post_id, action):
         return redirect(url_for('posts.post', post_id=post.id))         
        
 
-@posts.route('/post/<int:tag_id>/')
+@posts.route('/home/post/<int:tag_id>/')
 def tag_posts(tag_id):
     tag=Tag.query.filter_by(id=tag_id).first_or_404()
     page = request.args.get('page', 1, type=int)
@@ -224,7 +229,7 @@ def tag_posts(tag_id):
     return render_template('tag_posts.html', posts=posts)
 
 
-@posts.route('/<string:category>')
+@posts.route('/home/<string:category>')
 def posts_bygenre(category):
     form=SearchForm()
     page = request.args.get('page', 1, type=int)

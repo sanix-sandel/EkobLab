@@ -8,7 +8,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_admin import AdminIndexView, expose
 from flask_admin.form import rules
 from wtforms import widgets,TextAreaField, PasswordField
-
+import json
 
 
 @login_manager.user_loader
@@ -146,7 +146,7 @@ class Post(db.Model):
     
     nbcomments=db.Column(db.Integer, default=0)
     liked=db.relationship('PostLike', backref='post_liked', lazy='dynamic', cascade='all, delete-orphan')
-    nbrlikes=db.Column(db.Integer, default=0)
+    nbrlikes=db.Column(db.Integer, default=0, nullable=False)
 
    
     extend_existing=True
@@ -237,7 +237,7 @@ class File(db.Model):
     downloaded=db.Column(db.Integer, default=0)
     _img_id=db.Column(db.Integer, default=0)
     img_id=_img_id
-    file_size=db.Column(db.Float, nullable=True)
+    file_size=db.Column(db.String(10), nullable=True)
 
     extend_existing=True
 
@@ -394,7 +394,7 @@ class UserAdminView(ModelView):
     column_sortable_list = ('username', 'admin', 'email', 'location', 'confirmed', 'notifs.message',)
     column_exclude_list = ('password',)
     form_excluded_columns = ('password',)
-    form_edit_rules = ('username', 'admin', 'email', 'location', 'notifs', 'publisher', 'confirmed',)
+    form_edit_rules = ('username', 'admin', 'email', 'location', 'notifs', 'publisher', 'confirmed', 'books',)
     form_create_rules=('username', 'email', 'admin', 'location', 'aboutme')
 
     def is_accessible(self):

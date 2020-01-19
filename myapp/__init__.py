@@ -10,7 +10,7 @@ from flask_ckeditor import CKEditor
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 from flask_share import Share
-from myapp.tasks import make_celery
+from celery import Celery
 
 
 db=SQLAlchemy()
@@ -25,12 +25,48 @@ admin=Admin()
 share=Share()
 
 
-def create_app(config_class=Config):
+
+def make_celery(app_name=__name__):
+    CELERY_BROKER_URL='amqp://localhost//'
+    CELERY_RESULT_BACKEND='amqp://localhost//'
+    CELERY_IMPORTS = ("sending_email",)
+    
+    return Celery(app_name, backend=CELERY_RESULT_BACKEND, broker=CELERY_BROKER_URL, 
+        CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml'], imports=CELERY_IMPORTS, include=['myapp.tasks'])
+   
+
+celery=make_celery()
+   
+def init_celery(celery, app):
+    celery.conf.update(app.config)
+    TaskBase=celery.Task
+    class ContextTask(TaskBase):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task=ContextTask 
+
+
+    """
+    celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'],
+                    broker=app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+    TaskBase = celery.Task
+    class ContextTask(TaskBase):
+        abstract = True
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+    return celery"""
+
+
+def create_app(config_class=Config, **kwargs):
     Myapp=Flask(__name__)
     Myapp.config.from_object(Config)
-    Myapp.config['CELERY_BROKER_URL']='amqp://localhost//'
-    Myapp.config['CELERY_RESULT_BACKEND']='postgresql://sanix:19972017Russia@localhost/db'
-   
+    
+    
+    
     from myapp.models import MyAdminIndexView, File
     db.init_app(Myapp)
     bcrypt.init_app(Myapp)
@@ -58,4 +94,6 @@ def create_app(config_class=Config):
     Myapp.register_blueprint(files)
 
     #print(Myapp.config)
-    return Myapp
+    if kwargs.get("celery"):
+        init_celery(kwargs.get("celery"), Myapp)
+        return Myapp

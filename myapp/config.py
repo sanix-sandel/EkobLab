@@ -14,6 +14,7 @@ class Config:
     SIMPLEMDE_USE_CDN=True
     EKO_MAIL_SUBJECT_PREFIX='[EKOB]'
     EKO_MAIL_SENDER='techyintelo@gmail.com'
+    CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
     
 
 

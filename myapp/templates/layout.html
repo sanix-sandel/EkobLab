@@ -10,7 +10,8 @@
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}"></link>
 
-    <link rel="icon" type="image/png" href="static/LgBrowser.png" />
+    <!--<link rel="icon" type="image/png" href="static/LgBrowser.png" />-->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='LgBrowser.ico') }}">
 
     {% if title %}
         <em><title>EkoB - {{ title }}</title></em>
@@ -46,14 +47,14 @@
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="/"><img class="logo" src="static/logopage.png"></b></a>
+          <a class="navbar-brand mr-4" href="/"><img class="logo" src="{{url_for('static', filename='logopage.png') }}"></b></a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="{{ url_for('main.home') }}"><i class="fa fa-home"></i></a>
-              <a class="nav-item nav-link" href="{{ url_for('main.about') }}"><em> ? </em></a>
+              <a title="Home" class="nav-item nav-link" href="{{ url_for('main.home') }}"><i class="fa fa-home"></i></a>
+              <a title="About us" class="nav-item nav-link" href="{{ url_for('main.about') }}"><em> ? </em></a>
             </div>
            
              <!-- Search panel -->
@@ -65,7 +66,9 @@
 
               {% if current_user.is_authenticated %}
                 <div class="dropdown">
-                  <i class="dropbtn" ><i class="fa fa-bars"></i></i>
+                  <i class="dropbtn" >
+                    <i class="fa fa-bars"></i>
+                  </i>
                   <div class="dropdown-content">
                     <a href="{{url_for('main.trend')}}">Trending posts</a>
                     <a href="{{url_for('files.upload')}}">Upload files</a>
@@ -74,17 +77,23 @@
                     <a href="{{url_for('files.ebooks')}}">Recommended ebooks</a>
                   </div>
                 </div>
+
                 
-                <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}"><i class="fa fa-paper-plane-o"></i></a>
+                <a title="Create a post" class="nav-item nav-link" href="{{ url_for('posts.new_post') }}"><i class="fa fa-paper-plane-o"></i></a>
                
-                <a class="nav-item nav-link" href="{{ url_for('users.account') }}" ><i class="fa fa-user-circle"></i></a>
-                <a class="nav-item nav-link" href="#"><span class="fa fa-bell"><mark>{{current_user.nbrnotifs}}</mark></span></aclass=>
-                <a class="nav-item nav-link" href="{{ url_for('users.logout') }}"><i class="fa fa-power-off"></i></a>
+                <a class="nav-item nav-link" title="Your account" href="{{ url_for('users.account') }}" ><i class="fa fa-user-circle"></i></a>
+                <a class="nav-item nav-link" title="Notifications" href="{{url_for('users.user_notifs')}}"><i class="fa fa-bell">
+                    {% if current_user.nbrnotifs > 0 %}
+                      <mark>{{current_user.nbrnotifs}}</mark>
+                    {% endif %}  
+                  </i>
+                </a>
+                <a class="nav-item nav-link" title="Logout" href="{{ url_for('users.logout') }}"><i class="fa fa-power-off"></i></a>
 
                 
               {% else %}
-                <a class="nav-item nav-link" href="{{ url_for('users.login') }}"><i class="fa fa-sign-in"></i></a>
-                <a class="nav-item nav-link" href="{{ url_for('users.register') }}"><i class="fa fa-user-plus"></i></a>
+                <a class="nav-item nav-link" title="Sign in" href="{{ url_for('users.login') }}"><i class="fa fa-sign-in"></i></a>
+                <a class="nav-item nav-link" title="Register" href="{{ url_for('users.register') }}"><i class="fa fa-user-plus"></i></a>
               {% endif %}
             </div>
           </div>
@@ -105,8 +114,8 @@
           {% endwith %}
           {% block content %}{% endblock %}
         </div>
-        <!--
-        <div class="col-md-4">
+      <!--
+        <div class="col-md-2">
           <div class="content-section">
             <h3>Extras !</h3>
             <p class='text-muted'>You can put any information here you'd like.
@@ -125,7 +134,7 @@
             </p>
           </div>
         </div>
-        -->
+      -->  
        
       </div>
     </main>
@@ -146,10 +155,10 @@
           ultricies feugiat leo. Suspendisse tellus elit, pharetra in hendrerit ut, aliquam quis augue. Nam ut nibh mollis, tristique ante sed, viverra massa.
         </p>
         <div class="icons">
-          <a href=""><i class="fa fa-facebook"></i></a>
-          <a href="#"><i class="fa fa-twitter"></i></a>
-          <a href="#"><i class="fa fa-instagram"></i></a>
-          <a href="https://vk.com/id466137166"><i class="fa fa-vk"></i></a>
+          <a title="Facebook" href="https://www.facebook.com/Eko-B-111482570374929/"><i class="fa fa-facebook"></i></a>
+          <a title="Twitter" href="#"><i class="fa fa-twitter"></i></a>
+          <a title="Instagram" href="#"><i class="fa fa-instagram"></i></a>
+          <a  title="Vkontakte" href="https://vk.com/id466137166"><i class="fa fa-vk"></i></a>
         </div>
       </div>
       <div class="footer-center col-md-4 col-sm-6">
@@ -164,14 +173,14 @@
         </div>
       </div>
       <div class="footer-right col-md-4 col-sm-6">
-        <h2> <span><em>TB</em></span><em>TechyB</em></h2>
+        
         <p class="menu">
           <a href="#"> Home</a> |
           <a href="{{ url_for('main.about') }}"> About</a> |
       
         </p>
         
-        <img class="logo-bottom" src="static/logopage.png" href="{{url_for('main.home')}}">
+        <img class="logo-bottom" src="{{url_for('static', filename='logopage.png') }}" href="{{url_for('main.home')}}">
         <p class="name"> TechyB Inc. &copy; 2019</p>
       </div>
     </footer>  

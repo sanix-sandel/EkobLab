@@ -1,10 +1,7 @@
-from myapp import create_app
-from myapp import make_celery
+from myapp import create_app, celery
 
 
-Myapp=create_app()
-celery=make_celery(Myapp)
-
+Myapp=create_app(celery=celery)
 
 
 if __name__=='__main__':

@@ -13,10 +13,11 @@
      <!-- for the icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  
 
-    <link rel="icon" type="image/png" href="static/logobrowser.png" />
+    
+    <link rel="shortcut icon" href="{{ url_for('static', filename='LgBrowser.ico') }}">
 
     {% if title %}
-        <em><title>EkoBB - {{ title }}</title></em>
+        <em><title>EkoB - {{ title }}</title></em>
     {% else %}
         <em><title>EkoB</title></em>
     {% endif %}
@@ -48,6 +49,7 @@
         </div>
       </nav>
     </header>
+   
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
@@ -62,6 +64,7 @@
           {% endwith %}
           {% block content %}{% endblock %}
         </div>
+        <!--
         <div class="col-md-4">
           <div class="content-section">
             <h3>Extras !</h3>
@@ -83,7 +86,7 @@
         </div>
       </div>
     </main>
-
+  -->
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

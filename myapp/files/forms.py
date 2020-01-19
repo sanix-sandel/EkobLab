@@ -15,7 +15,8 @@ class FileForm(FlaskForm):
     title=StringField('Title/Titre', validators=[DataRequired(), Length(min=2, max=40)])
     description=TextAreaField('About the doc', validators=[DataRequired(), Length(10, 500)])
     filedata = FileField('Upload the doc', validators=[FileAllowed(['pdf', 'epub'])])
-    genre=QuerySelectField('Genre', query_factory=choice_query, allow_blank=True, get_label='title')
+    cover=FileField('Upload doc cover', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    genre=QuerySelectField('Genre', query_factory=choice_query, allow_blank=True, get_label='title', validators=[DataRequired()])
     submit=SubmitField('Add/Ajouter')
     
 

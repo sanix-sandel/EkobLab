@@ -45,7 +45,7 @@ def securityblock():
     return render_template('errors/404.html'), 404
 
 
-@main.route("/trends")
+@main.route("/home/trends")
 def trend():
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.reads.desc()).paginate(page=page, per_page=5)

@@ -5,58 +5,60 @@
 {{ share.load() }}
 
 
-
-
-
-<article class="media content-section">
-  <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
-  <div class="media-body">
-    <div class="article-metadata">
-      <a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{ post.author.username }}</a>
-      <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
-      <small class="text-muted">{{ post.author.location }}</small>
-      <div>
-        {% if post.author==current_user %}
-          <p class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOption"><span class="glyphicon glyphicon-th-list">
-            </span class="ecrits">Options</a>
-          </p> 
-          <div id="collapseOption" class="panel-collapse collapse">
-            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.update_post', post_id=post.id) }}">Update</a>
-            <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
-          </div>
+ 
+  
+    
+    <article class="media content-section">
+      <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
+      <div class="media-body">
+        <div class="article-metadata">
+          <a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{ post.author.username }}</a>
+          <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+          <small class="text-muted">{{ post.author.location }}</small>
+          <div>
+            {% if post.author==current_user %}
+              <p class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion" href="#collapseOption"><span class="glyphicon glyphicon-th-list">
+                </span class="ecrits">...</a>
+              </p> 
+              <div id="collapseOption" class="panel-collapse collapse">
+                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.update_post', post_id=post.id) }}">Update</a>
+                <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+              </div>
           
-        {% endif %}
-      </div>
-    </div>
+            {% endif %}
+          </div>
+        </div>
     
     
 
-    <div class="article-metadata">
-      <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
-      <p class="article-content">{{ post.content |safe}} </p>
+        <div class="article-metadata">
+          <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
+          <p class="article-content">{{ post.content |safe}} </p>
       
-      <div> <!--POur les tags-->
-        {% for tags in post.tags -%}
-          <a href="{{ url_for('posts.tag_posts', tag_id=tags.id) }}"><span class="badge badge-primary">{{ tags.title }}</span></a>
-        {% endfor %}
-      </div>
+          <div> <!--POur les tags-->
+            {% for tags in post.tags -%}
+              <a href="{{ url_for('posts.tag_posts', tag_id=tags.id) }}"><span class="badge badge-primary">{{ tags.title }}</span></a>
+            {% endfor %}
+          </div>
      
-    </div>
-    <div class="card-footer">
-      <a href="{{url_for('posts.like_action', post_id=post.id, action='like')}}" class="card-link"><i class="fa fa-gittip"></i> ({{post.nbrlikes}})Like</a>
+        </div>
+        <div class="card-footer">
+          <a href="{{url_for('posts.like_action', post_id=post.id, action='like')}}" class="card-link"><i class="fa fa-gittip"></i> ({{post.nbrlikes}})Like</a>
       
-      <a href="#" class="card-link"><i class="fa fa-comment"></i> ({{post.nbcomments}})Comment</a>
-      <i>Share</i>
-      <div class="dropdown">
-        <i class="dropbtn" ><i class="fa fa-mail-forward"></i></i>
-        <div class="dropdown-content">
-          {{ share.create(title='Share with: ') }}
+          <a href="#" class="card-link"><i class="fa fa-comment"></i> ({{post.nbcomments}})Comment</a>
+          <i>Share</i>
+          <div class="dropdown">
+            <i class="dropbtn" ><i class="fa fa-mail-forward"></i></i>
+            <div class="dropdown-content">
+              {{ share.create(title='Share with: ') }}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</article>
+    </article>
+    
+  
   
   
   <!-- Modal -->

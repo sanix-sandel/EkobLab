@@ -68,9 +68,9 @@
 
 
     <div class="container">
-      {% for file in files.items %}
+      
         <div class="row">
-          
+          {% for file in files.items %}
           <div class="col-sm-4 py-2">
               <div class="card h-100 text-white bg-danger">
                   <div class="card-body">
@@ -85,15 +85,15 @@
                   </div>
               </div>
           </div>
-      {% endfor %}   
+          {% endfor %}   
         </div>
     </div>  
     {% for page_num in files.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
       {% if page_num %}
         {% if files.page == page_num %}
-          <a class="btn btn-info mb-4" href="{{ url_for('files.allfiles', page=page_num) }}">{{ page_num }}</a>
+          <a class="btn btn-info mb-4" href="{{ url_for('files.files_bygenre', category=genre.title, page=page_num) }}">{{ page_num }}</a>
         {% else %}
-          <a class="btn btn-outline-info mb-4" href="{{ url_for('files.allfiles', page=page_num) }}">{{ page_num }}</a>
+          <a class="btn btn-outline-info mb-4" href="{{ url_for('files.files_bygenre', category=genre.title, page=page_num) }}">{{ page_num }}</a>
         {% endif %}
       {% else %}
         ...

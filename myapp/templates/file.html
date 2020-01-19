@@ -22,7 +22,7 @@
 </article>
   
   <a href="{{url_for('files.download', file_id=file_id)}}">
-   <button class="btn"><i class="fa fa-download"></i> Download {{ file.file_size }} MB </button>
+   <button class="btn"><i class="fa fa-download"></i> Download {{ (file.file_size)[:5] }} MB </button>
   </a>
 
   {{ share.create(title='Share with: ') }}  

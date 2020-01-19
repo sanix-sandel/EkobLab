@@ -1,5 +1,16 @@
-{% extends "layout.html" %}
+{% extends "loginlayout.html" %}
 
 {% block content %}
 
+{% for notif in notifs %}
+    <article class="media content-section">
+        <div class="media-body">
+        <div class="article-metadata">
+            <div> 
+                <a href="#"><span class="badge badge-primary">{{ notif.message }}</span></a>
+            </div>
+        </div>
+        </div>
+    </article>
+{% endfor %}
 {% endblock content %}

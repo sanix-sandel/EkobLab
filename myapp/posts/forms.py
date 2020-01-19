@@ -12,7 +12,7 @@ def choice_query():
 
 class PostForm(FlaskForm):
     title=StringField('Title/Titre', validators=[DataRequired(), Length(min=5, max=150)])
-    genre=QuerySelectField('Genre', query_factory=choice_query, allow_blank=True, get_label='title')
+    genre=QuerySelectField('Genre', query_factory=choice_query, allow_blank=True, get_label='title', validators=[DataRequired()])
     submit=SubmitField('Continuer')
     
 class TagForm(FlaskForm):
