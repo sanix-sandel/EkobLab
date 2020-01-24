@@ -41,7 +41,7 @@ def Newpost(title, category):
             flash('The post must have a content', 'danger')
             return redirect(url_for('main.home'))
         else:    
-            post=Post(title=title, content=content, author=current_user, category=category)
+            post=Post(title=title.capitalize(), content=content, author=current_user, category=category)
               
             db.session.add(post)
             db.session.commit()

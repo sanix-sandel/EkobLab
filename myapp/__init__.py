@@ -11,7 +11,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 from flask_share import Share
 from celery import Celery
-
+import os
 
 db=SQLAlchemy()
 bcrypt=Bcrypt()
@@ -26,6 +26,8 @@ share=Share()
 
 
 
+
+
 def make_celery(app_name=__name__):
     CELERY_BROKER_URL='amqp://localhost//'
     CELERY_RESULT_BACKEND='amqp://localhost//'
@@ -36,18 +38,22 @@ def make_celery(app_name=__name__):
    
 
 celery=make_celery()
-   
+
+  
 def init_celery(celery, app):
+    
     celery.conf.update(app.config)
+    
     TaskBase=celery.Task
     class ContextTask(TaskBase):
+        abstract=True
         def __call__(self, *args, **kwargs):
             with app.app_context():
                 return TaskBase.__call__(self, *args, **kwargs)
     celery.Task=ContextTask 
+    
 
-
-    """
+"""
     celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'],
                     broker=app.config['CELERY_BROKER_URL'])
     celery.conf.update(app.config)
@@ -58,15 +64,21 @@ def init_celery(celery, app):
             with app.app_context():
                 return TaskBase.__call__(self, *args, **kwargs)
     celery.Task = ContextTask
-    return celery"""
+    return celery
+"""
 
+PKG_NAME=os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
-def create_app(config_class=Config, **kwargs):
-    Myapp=Flask(__name__)
+def create_app(config_class=Config, app_name=PKG_NAME, **kwargs):
+    Myapp=Flask(app_name)
     Myapp.config.from_object(Config)
     
+
+    #print(Myapp.config)
     
-    
+    if kwargs.get("celery"):
+        init_celery(kwargs.get("celery"), Myapp)
+
     from myapp.models import MyAdminIndexView, File
     db.init_app(Myapp)
     bcrypt.init_app(Myapp)
@@ -77,7 +89,7 @@ def create_app(config_class=Config, **kwargs):
     migrate.init_app(Myapp, db)
     share.init_app(Myapp)
     
-
+    
 
     from myapp.users.routes import users
     from myapp.posts.routes import posts
@@ -91,9 +103,7 @@ def create_app(config_class=Config, **kwargs):
     Myapp.register_blueprint(main)
     Myapp.register_blueprint(errors)
     Myapp.register_blueprint(comments)
-    Myapp.register_blueprint(files)
+    Myapp.register_blueprint(files) 
+    return Myapp
 
-    #print(Myapp.config)
-    if kwargs.get("celery"):
-        init_celery(kwargs.get("celery"), Myapp)
-        return Myapp
+ 

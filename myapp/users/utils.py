@@ -1,11 +1,12 @@
 import os
 import secrets
 from PIL import Image
-from flask import url_for, current_app, render_template
+from flask import url_for, current_app, render_template, Flask
 from flask_mail import Message
 from myapp import mail, celery, create_app
 from myapp.tasks import send_email
 
+app=current_app
 
 def save_picture(form_picture):
     random_hex=secrets.token_hex(8)#we have the image file a randomized name
@@ -37,11 +38,13 @@ def send_reset_email(user):
 
 def msg_to_dict(to, subject, template, **kwargs):
     msg=Message(subject, sender='techyintelo@gmail.com', recipients=[to])
-    msg.body=render_template(template+'.txt', **kwargs)
-    msg.html=render_template(template+'.html', **kwargs)
+    msg.body=render_template(template+'.html', **kwargs)
+    msg.html=render_template(template+'.txt', **kwargs)
     return msg.__dict__ 
 
 
 
 def send_mail(to, subject, template, **kwargs):
-    send_email.delay(msg_to_dict(to, subject, template, **kwargs))
+    app=create_app()
+    with app.app_context():
+        send_email.delay(msg_to_dict(to, subject, template, **kwargs))
