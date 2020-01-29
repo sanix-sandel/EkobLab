@@ -1,9 +1,9 @@
 from datetime import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from myapp import (db, login_manager, admin, bcrypt)
+from myapp.factory import (db, login_manager, admin, bcrypt)
 from flask import (current_app, flash, redirect,  url_for)
 from flask_login import UserMixin, current_user, login_required
-from myapp import admin
+from myapp.factory import admin
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import AdminIndexView, expose
 from flask_admin.form import rules

@@ -1,11 +1,11 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
-from myapp import db, bcrypt
+from myapp.factory import db, bcrypt, mail
 from myapp.models import User, Post
 from myapp.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm)
 from myapp.users.utils import save_picture, send_reset_email, send_mail
-from myapp import mail
+
 
 
 users=Blueprint('users', __name__)
@@ -23,6 +23,7 @@ def register():
         db.session.commit()
         token=user.generate_confirmation_token()
         send_mail(user.email,'Confirm your Account', 'registration_confirmation', user=user, token=token)
+        
         flash('A confirmation mail has been sent to you ! Check your mail box and confirm your account please !', 'success')
         return redirect(url_for('users.login'))
     return render_template('register.html', title='Register', form=form)

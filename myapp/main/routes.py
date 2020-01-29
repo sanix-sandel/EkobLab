@@ -1,7 +1,7 @@
 from flask import (render_template, request, Blueprint, redirect, url_for, current_app, flash)
 from myapp.models import Post, File, Genre
 from myapp.files.forms import SearchForm
-from myapp import db
+from myapp.factory import db
 
 main=Blueprint('main', __name__)
 

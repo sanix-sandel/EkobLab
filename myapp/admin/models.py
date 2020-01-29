@@ -1,9 +1,10 @@
-from myapp import admin
+from myapp.factory import admin
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import AdminIndexView
 from flask_admin.form import rules
 from wtforms import widgets,TextAreaField, PasswordField
 from myapp.models import User, File, Post, Comment
+from flask_login import login_user, current_user, logout_user, login_required
 
 
 class CKTextAreaWidget(widgets.TextArea):

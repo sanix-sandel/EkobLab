@@ -1,5 +1,6 @@
-from myapp import celery, db, mail, create_app
-from flask import redirect, url_for, current_app
+from myapp import celery
+from myapp.factory import db, mail
+from flask import redirect, url_for, current_app, flash
 from flask_mail import Message
 
 

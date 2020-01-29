@@ -1,14 +1,13 @@
 from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint, request, send_file, Response, g, current_app)
 from flask_login import current_user, login_required
-from myapp import db
+from myapp.factory import db, mail
 from myapp.models import File, Ebook, Cover, User, Notif, Genre
 from myapp.files.forms import FileForm, EbookForm, SearchForm
 import bleach
 from io import BytesIO
 from flask import Markup
 from flask_mail import Message
-from myapp import mail
 from sqlalchemy.orm.util import join
 from datetime import datetime
 import os

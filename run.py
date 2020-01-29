@@ -1,13 +1,10 @@
-from myapp import create_app, celery
+from myapp import factory
+import myapp 
 
 
-Myapp=create_app(celery=celery)
-
-
-if __name__=='__main__':
+if __name__=='__main__': 
+    Myapp=factory.create_app(celery=myapp.celery)   
     Myapp.run(debug=True)
-    
-
 
 
 

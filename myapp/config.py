@@ -15,8 +15,9 @@ class Config:
     EKO_MAIL_SUBJECT_PREFIX='[EKOB]'
     EKO_MAIL_SENDER='techyintelo@gmail.com'
     CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
-    
-
+    CELERY_BROKER_URL='amqp://localhost//'
+    CELERY_RESULT_BACKEND='amqp://localhost//'
+   
 
 #ici
 class ProductionConfig(Config):

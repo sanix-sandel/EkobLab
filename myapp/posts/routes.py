@@ -1,7 +1,7 @@
 from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint)
 from flask_login import current_user, login_required
-from myapp import db
+from myapp.factory import db
 from myapp.models import Post, Comment, Tag, Reply, Genre, Notif
 from myapp.posts.forms import PostForm, TagForm
 from myapp.comments.forms import CommentForm
