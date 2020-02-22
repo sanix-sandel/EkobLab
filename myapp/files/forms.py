@@ -13,6 +13,7 @@ def choice_query():
 
 class FileForm(FlaskForm):
     title=StringField('Title/Titre', validators=[DataRequired(), Length(min=2, max=40)])
+    auteur=StringField('Author/Auteur', validators=[DataRequired(), Length(min=0, max=100)])
     description=TextAreaField('About the doc', validators=[DataRequired(), Length(10, 500)])
     filedata = FileField('Upload the doc', validators=[FileAllowed(['pdf', 'epub'])])
     cover=FileField('Upload doc cover', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])

@@ -50,15 +50,13 @@
                   <div class="card-body">
                     
                       <a href="{{ url_for('files.file', file_id=file.id) }}" class="article-title">
-                        <h3 class="card-title">{{file.title}}</h3>
+                        <h6 class="card-title">{{file.title}}</h6>
                       </a>                      
                       
                       <div class="imagecover">
                         <img class="cover" src="{{url_for('files.serve_image', img_id=file.img_id)}}">
                       </div>
-                        
-                      <p class="card-text">{{file.description}}</p>
-                      
+                      <h8>{{file.auteur}}</h8>
                      
                   </div>
                 

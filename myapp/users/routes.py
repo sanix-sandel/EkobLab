@@ -4,8 +4,7 @@ from myapp.factory import db, bcrypt, mail
 from myapp.models import User, Post
 from myapp.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm)
-from myapp.users.utils import save_picture, send_reset_email, send_mail
-
+from myapp.users.utils import save_picture, send_reset_email, send_mail, msg_to_dict
 
 
 users=Blueprint('users', __name__)
@@ -18,7 +17,7 @@ def register():
     form=RegistrationForm()
     if form.validate_on_submit():#si il valide son enregistrement, ses donnnées sont envoyées à la DB
         hashed_password=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=True, publisher=True )
+        user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=False, publisher=False )
         db.session.add(user)
         db.session.commit()
         token=user.generate_confirmation_token()
@@ -94,12 +93,13 @@ def user_posts(username):
         .paginate(page=page, per_page=5)
     return render_template('user_posts.html', posts=posts, user=user)  
 
-   
+
 @users.route("/user/notifications")
 @login_required
 def user_notifs():
     notifs=current_user.notifs
     current_user.getnot=0
+    
     db.session.commit()
     return render_template('notifications.html', notifs=notifs)      
 
@@ -146,9 +146,11 @@ def confirm(id, token):
     if user.confirm(token):
         
         db.session.commit()
-        flash('You have confirmed your account, thank you !')
+        flash('You have confirmed your account, thank you !', 'success')
          
     else:
-        flash('The confirmation link is invalid or has expired')
-      
+        flash('The confirmation link is invalid or has expired', 'warning')
+        flash('A new mail has been sent to you, confirm your account please', 'success')
+        token=user.generate_confirmation_token()
+        send_mail(user.email,'Confirm your Account again !', 'registration_confirmation', user=user, token=token)
     return redirect(url_for('main.home'))              

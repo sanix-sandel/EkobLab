@@ -33,6 +33,9 @@ def new_post():
 @posts.route("/post/newpost/<string:title>/<string:category>", methods=['GET', 'POST'])
 @login_required
 def Newpost(title, category):
+    if not current_user.is_publisher():
+        flash('You have to contact the admin for access', 'danger')
+        return redirect(url_for('main.home'))
     tags=Tag.query.all()
     
     if request.method=='POST':
@@ -41,7 +44,7 @@ def Newpost(title, category):
             flash('The post must have a content', 'danger')
             return redirect(url_for('main.home'))
         else:    
-            post=Post(title=title.capitalize(), content=content, author=current_user, category=category)
+            post=Post(title=title.title(), content=content, author=current_user, category=category)
               
             db.session.add(post)
             db.session.commit()
@@ -75,6 +78,7 @@ def tagpicked(post_id, titles):
             tag=Tag.query.filter_by(title=title).first()
             post.tags.append(tag)
             db.session.commit()
+    
     return redirect(url_for('main.home'))
 
 
@@ -89,7 +93,6 @@ def tagpick(post_id, tag_id):
 
 
 @posts.route("/post/<int:post_id>", methods=['GET', 'POST'])
-@login_required
 def post(post_id):
     
     post = Post.query.get_or_404(post_id)
@@ -118,9 +121,9 @@ def commenter(content, post_id):
     db.session.commit()
     post.nbrcomments+=1
     if not current_user==author:
-        notif=Notif.query.filter_by(title='PostCommented').first()
-        author.notifs.append(notif)
-        author.getnot+=1
+        #notif=Notif.query.filter_by(title='PostCommented').first()
+        #author.notifs.append(notif)
+       # author.getnot+=1
         db.session.commit()
     flash('Your comment has been added', 'success')
     return redirect (url_for('posts.post', post_id=post.id))
@@ -233,11 +236,13 @@ def tag_posts(tag_id):
 def posts_bygenre(category):
     form=SearchForm()
     page = request.args.get('page', 1, type=int)
-    genre=Genre.query.filter_by(title=category).first()
-    posts=Post.query.filter_by(category=genre.title)\
-        .order_by(Post.date_posted.desc())\
-        .paginate(page=page, per_page=5)
-
+    try:
+        genre=Genre.query.filter_by(title=category).first()
+        posts=Post.query.filter_by(category=genre.title)\
+            .order_by(Post.date_posted.desc())\
+            .paginate(page=page, per_page=5)
+    except:
+        return redirect(url_for('main.home'))
     genres=Genre.query.all()
     return render_template('posts_bygenre.html', genre=genre, posts=posts, genres=genres, form=form)    
 

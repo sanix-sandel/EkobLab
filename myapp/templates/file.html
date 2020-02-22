@@ -12,6 +12,7 @@
         
       </div>
         <h2 class="article-title">{{ file.title | safe }}</h2>
+        <h8>{{file.auteur}}</h8>
         <div class="imagecover">
           <img class="cover" src="{{url_for('files.serve_image', img_id=file.img_id)}}">
         </div>
@@ -22,8 +23,10 @@
 </article>
   
   <a href="{{url_for('files.download', file_id=file_id)}}">
-   <button class="btn"><i class="fa fa-download"></i> Download {{ (file.file_size)[:5] }} MB </button>
+   <button class="btn"><i class="fa fa-download"></i> Download {{ file_size }} MB </button>
   </a>
+  
+
 
   {{ share.create(title='Share with: ') }}  
 

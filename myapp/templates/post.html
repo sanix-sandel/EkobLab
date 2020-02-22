@@ -2,6 +2,7 @@
 
 
 {% block content %}
+
 {{ share.load() }}
 
 
@@ -183,11 +184,16 @@
           <small class="text-muted">{{ pots.author.location }}</small>
         </div>
         <h2><a class="article-title" href="{{ url_for('posts.post', post_id=pots.id) }}">{{ pots.title }}</a></h2>
+        <div> <!--POur les tags-->
+          {% for tags in pots.tags -%}
+            <a href="{{ url_for('posts.tag_posts', tag_id=tags.id) }}"><span class="badge badge-primary">{{ tags.title }}</span></a>
+          {% endfor %}
+        </div>
        
       </div>
     </article>
 {% endfor %}
-  
+ 
 {{ share.create(title='Share with: ') }}
 
 {% endblock %}

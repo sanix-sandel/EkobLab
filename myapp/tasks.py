@@ -10,3 +10,5 @@ def send_email(msg_dict):
     msg=Message()
     msg.__dict__.update(msg_dict)
     mail.send(msg)
+
+

@@ -21,6 +21,19 @@
                 {% endif %}
             </div>
             <div class="form-group">
+                {{ form.auteur.label(class="form-control-label") }}
+                {% if form.auteur.errors %}
+                    {{ form.auteur(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.auteur.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.auteur(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
                 {{ form.description.label(class="form-control-label") }}
                 {% if form.description.errors %}
                     {{ form.description(class="form-control form-control-lg is-invalid") }}

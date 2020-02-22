@@ -18,10 +18,7 @@ def home():
         searched=form.search.data
         searched=searched.capitalize()
         flash('Search results of the keyword '+searched, 'success')
-        
-        
-        return search_results(searched)
-       
+        return search_results(searched) 
     return render_template('home.html', posts=posts, form=form, genres=genres)
 
 

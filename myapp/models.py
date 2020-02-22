@@ -131,7 +131,6 @@ tags=db.Table('post_tags',
 )
 
 
-
 class Post(db.Model):
    
     id=db.Column(db.Integer, primary_key=True)
@@ -238,7 +237,7 @@ class File(db.Model):
     _img_id=db.Column(db.Integer, default=0)
     img_id=_img_id
     file_size=db.Column(db.String(10), nullable=True)
-
+    auteur=db.Column(db.String(100), nullable=True)
     extend_existing=True
 
 
@@ -292,11 +291,8 @@ class Notif(db.Model):
     message=db.Column(db.Text())
 
 
-
     def __repr__(self):
         return f"Notif(' : {self.message}')" 
-
-              
 
 class CKTextAreaWidget(widgets.TextArea):
     def __call__(self, field, **kwargs):

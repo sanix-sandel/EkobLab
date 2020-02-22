@@ -1,0 +1,11 @@
+    Whoopi !
+    Dear {{ username }},
+
+    the ebook (titled: {{title}}) you needed has been uploaded by a volunteer ! You can check it out,
+    by visiting  <a href="{{url_for('main.home')}}">Eko-B</a>
+    If you did not make this request then simply ignore this email and no changes will be made.
+    Eko-B Team.
+    
+    Sincerely,
+    
+    EKOB Team.

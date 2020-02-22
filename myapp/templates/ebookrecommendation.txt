@@ -1,0 +1,7 @@
+<p>
+    Dear {{username}},
+    We received your E-Book (title: {{title}}) recommendation , we'll do our best to find the book, upload it and  
+    then you'll get notified to download it on EkoB. 
+    If you did not make this request then simply ignore this email and no changes will be made.
+        EkoB Team.
+</p>

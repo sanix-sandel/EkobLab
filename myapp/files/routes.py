@@ -1,9 +1,10 @@
-from flask import (render_template, url_for, flash,
+from flask import (render_template, url_for, flash, make_response,
                    redirect, request, abort, Blueprint, request, send_file, Response, g, current_app)
 from flask_login import current_user, login_required
 from myapp.factory import db, mail
 from myapp.models import File, Ebook, Cover, User, Notif, Genre
 from myapp.files.forms import FileForm, EbookForm, SearchForm
+from myapp.users.utils import save_picture, send_reset_email, send_mail, msg_to_dict
 import bleach
 from io import BytesIO
 from flask import Markup
@@ -11,6 +12,7 @@ from flask_mail import Message
 from sqlalchemy.orm.util import join
 from datetime import datetime
 import os
+
 
 
 files=Blueprint('files', __name__)
@@ -51,88 +53,52 @@ def upload():
     if form.validate_on_submit():
         flash('Your file has been successfully uploaded !', 'succes')        
         form.filedata.data.seek(0, os.SEEK_END)
-        file_length=str(form.filedata.data.tell()/1000)
-        file_length=str(file_length)
+        file_length=form.filedata.data.tell()/1000000
+        file_length=str(file_length)[:4]
         category=form.genre.data
-        newFile=File(title=form.title.data.capitalize(), data=form.filedata.data.read(), 
+        newFile=File(title=form.title.data.title(), data=form.filedata.data.read(), 
             description=form.description.data, uploader=current_user, downloaded=0,
-            file_size=file_length, category=category.title)
+            file_size=file_length, category=category.title, auteur=form.auteur.data)
         cover=Cover(file=newFile, data=form.cover.data.read())
         flash('Your file has been successfully uploaded', 'success')
         db.session.add(cover)            
         db.session.commit()  
-        objet.img_id=cover.id
+        newFile.img_id=cover.id
         db.session.add(newFile)
         db.session.commit()
               
     return render_template("fileupload.html", form=form)
 
-"""
-db.session.add(cover)
-                c
-db.session.commit()  
-newFile.img_id=cover.id
-db.session.add(newFile)
-db.session.commit() 
-"""
 
 
 @login_required
-@files.route('/home/upload/<int:recommender_id>', methods=['GET', 'POST'])
-def uploadv(recommender_id):
+@files.route('/home/upload/<int:recommender_id>/<int:ebook_id>', methods=['GET', 'POST'])
+def uploadv(recommender_id, ebook_id):
     form=FileForm()
     recommender=User.query.filter_by(id=recommender_id).first()
-    if request.method=='POST':
-
-        if 'file' not in request.files:
-            flash('No file part !')
-        file=request.files['file']
-
-        if file.filename=='':
-            flash('No file selected ', 'danger')
-            return redirect(request.url)    
-        if not allowed_file(file.filename):
-            flash('Only PDF files, please', 'danger')
-
-        cover=request.files['cover']
-        if not file_allowed(cover.filename):
-            flash('Only png, jpeg, jpg files allowed')
-         
-    #if form.is_submitted():
-        else:
-            if form.validate_on_submit():
-                flash('Your file has been successfully uploaded !', 'succes')
-                flash('thank You very much, Keep helping the biblio grow', 'succes')
-                file.seek(0, os.SEEK_END)
-                file_length=str(file.tell()/1000)
-                category=form.genre.data
-                newFile=File(title=form.title.data.capitalize(), data=file.read(), 
-                    description=form.description.data, uploader=current_user, downloaded=0,
-                    file_size=file_length, category=category.title)
-                cover=Cover(file=newFile, data=cover.read())
-                db.session.add(cover)
-                current_user.getbooks+=1
-                db.session.commit()  
-                newFile.img_id=cover.id
-                db.session.add(newFile)
-                db.session.commit() 
-            
-
-                msg = Message('E-Books Recommendation',
-                    sender='techyintelo@gmail.com',
-                    recipients=[recommender.email])
-                msg.body = f'''Woopi ! the ebook you needed has been uploaded by a volunteer ! You can check it out 
-                If you did not make this request then simply ignore this email and no changes will be made.
-                TechyB Team.
-                '''
-                mail.send(msg)
-                notif=Notif.query.filter_by(title='EbookUploaded').first()
-                recommender.notifs.append(notif)
-                recommender.getnot+=1
-                db.session.commit()
-                return redirect(url_for('files.allfiles')) 
+    ebook=Ebook.query.filter_by(id=ebook_id).first()
+    flash('Keep making the library grow for the sake of all', 'success')
+    if form.validate_on_submit():
+               
+        form.filedata.data.seek(0, os.SEEK_END)
+        file_length=form.filedata.data.tell()/1000000
+        file_length=str(file_length)[:4]
+        category=form.genre.data
+        newFile=File(title=ebook.title.title(), data=form.filedata.data.read(), 
+            description=form.description.data, uploader=current_user, downloaded=0,
+            file_size=file_length, category=category.title, auteur=form.auteur.data)
+        cover=Cover(file=newFile, data=form.cover.data.read())
+        flash('Your file has been successfully uploaded. Thank you very much !', 'success')
+        db.session.add(cover)            
+        db.session.commit()  
+        newFile.img_id=cover.id
+        db.session.add(newFile)
+        db.session.commit()
+    
+        send_mail(recommender.email,'Recommended Ebook uploaded', 'ebookuploaded', username=recommender.username, title=newFile.title)
+        return redirect(url_for('files.allfiles')) 
               
-    return render_template("fileupload2.html", form=form)
+    return render_template("fileupload2.html", form=form, title=ebook.title.capitalize())
 
 
 @login_required
@@ -140,7 +106,7 @@ def uploadv(recommender_id):
 def file(file_id):
     
     file = File.query.get_or_404(file_id)
-    return render_template('file.html', title=file.title, file=file, file_id=file_id, cover=file.cover, img_id=file.img_id)
+    return render_template('file.html', title=file.title, file=file, file_id=file_id, cover=file.cover, file_size=file.file_size, img_id=file.img_id)
 
 @login_required
 @files.route('/file/<int:file_id>/download', methods=['POST', 'GET'])
@@ -149,7 +115,8 @@ def download(file_id):
     file_data.downloads()
     db.session.commit()
     return send_file(BytesIO(file_data.data), attachment_filename=file_data.title, as_attachment=True) 
-     
+
+
 
 @login_required
 @files.route("/home/recommend", methods=['GET', 'POST'])
@@ -160,15 +127,7 @@ def recommend():
         ebook=Ebook(title=form.title.data.capitalize(), author=form.author.data, recommender=current_user)
         db.session.add(ebook)
         db.session.commit()
-        msg = Message('E-Books Recommendation',
-                  sender='techyintelo@gmail.com',
-                  recipients=[current_user.email])
-        msg.body = f'''We received your E-Book recommendation , Soon we'll 
-        send you by this mail a link in order to download the E-Book. 
-        If you did not make this request then simply ignore this email and no changes will be made.
-        TechyB Team.
-        '''
-        mail.send(msg)
+        send_mail(current_user.email,'Recommendation of an Ebook', 'ebookrecommendation', username=current_user.username, title=ebook.title)
         return redirect(url_for('main.home'))  
     return render_template('recommend.html', form=form)
 
