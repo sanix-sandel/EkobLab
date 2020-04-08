@@ -17,7 +17,7 @@ def register():
     form=RegistrationForm()
     if form.validate_on_submit():#si il valide son enregistrement, ses donnnées sont envoyées à la DB
         hashed_password=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=False, publisher=False )
+        user=User(username=form.username.data, email=form.email.data, password=hashed_password, admin=True, publisher=True )
         db.session.add(user)
         db.session.commit()
         token=user.generate_confirmation_token()

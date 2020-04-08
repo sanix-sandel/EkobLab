@@ -121,7 +121,7 @@ class User(db.Model, UserMixin):
         return User.query.get(user_id)
 
     def __repr__(self):
-        return f"User ('{self.username}','{self.email}', '{self.image_file}')"   
+        return f"'{self.username}'"   
 
 
 tags=db.Table('post_tags',
@@ -180,7 +180,7 @@ class Post(db.Model):
         self.nbcomments=c
        
     def __repr__(self):
-        return f"Post('{self.title}', '{self.date_posted}')"
+        return f"('{self.title}', '{self.author.username}')"
 
 
 
@@ -283,7 +283,7 @@ class Tag(db.Model):
     title=db.Column(db.String(20))
 
     def __repr__(self):
-        return f"Tag('{self.title}')" 
+        return f"('{self.title}')" 
 
 class Notif(db.Model):
     id=db.Column(db.Integer(), primary_key=True)

@@ -1,0 +1,104 @@
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/networkgraph.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<link rel="stylesheet" href="{{url_for('static', filename='network.css')}}"><link>
+
+
+<input type="file" />
+<figure class="highcharts-figure">
+    <div id="container">
+      <script>
+      /* 
+        const input=document.querySelector('input[type="file"]')
+        input.addEventListener('change', function(e)
+        {
+            const reader=new FileReader()
+            reader.onload=function(){
+                const lines=reader.result.split('\n').map(function(line){
+                    return line.split(',')
+                })
+               
+                a="";
+                a=lines;
+                
+                var c=String(lines) 
+                n=c.length
+                var b=c.slice(1, n-1)
+                d=b.split("],")
+                for(var i=0; i<d.length; i++)
+                {
+                  d[i]=d[i].split(",")
+                }
+            
+                alert(d[0][1])
+                alert(a)*/
+//
+
+
+var ourRequest=new XMLHttpRequest();
+ourRequest.open('GET', "https://raw.githubusercontent.com/sanix-sandel/EkoB/master/myjson.json")
+
+ourRequest.onload=function(){
+  ourData = JSON.parse(ourRequest.responseText);
+  console.log(ourData);
+
+  Highcharts.chart('container', {
+  chart: {
+    type: 'networkgraph',
+    marginTop: 60
+  },
+  title: {
+    text: 'Network graph'
+  },
+  plotOptions: {
+    networkgraph: {
+      keys: ['from', 'to'],
+    }
+  },
+  series: [{
+    marker: {
+      radius: 5
+    },
+    dataLabels: {
+      enabled: true,
+      linkFormat: '',
+      allowOverlap: true
+    },
+    data: ourData 
+  }]
+  });
+
+
+
+
+};
+ourRequest.send()
+
+
+
+
+//
+/*
+            }
+            reader.readAsText(input.files[0])
+            
+        }, false)*/
+        
+    </script>
+
+		  <script>
+        
+        var moi="TheSk";
+        
+        alert("lie")
+        //
+      </script>
+	</div>
+    <p class="highcharts-description">
+        This force directed graph shows an example of a network graph, where
+        the nodes represent languages and the language families they belong to.
+        The nodes can be dragged around and will be repositioned dynamically.
+        Network graphs are typically used to show relations in data. In this
+        case, we are showing a hierarchical structure.
+    </p>
+</figure>

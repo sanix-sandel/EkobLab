@@ -1,0 +1,72 @@
+<link rel="stylesheet" src="chart.css">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='chart.css') }}"></link>
+
+<div class="pg-orgchart">
+    <div class="org-chart">
+		<ul>
+            <li>
+                <div class="user">
+                    <img src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}" class="img-responsive" />
+                    <a href="{{url_for('main.relation1', id=post.author.id)}}">
+                        <div class="name">{{post.author.username}}</div>
+                    </a>
+                    <div class="role">Author</div>
+                    
+                </div>
+            </li>    
+        </ul>
+    </div> 
+</div>   
+<div class="pg-orgchart">
+    <div class="org-chart">
+		<ul>
+            <li>
+                <div class="user">
+                    <p>Post</p>
+                    <div class="name">{{post.title}}</div>
+                    <div class="role"></div>
+                    
+                </div>
+            </li>    
+        </ul>
+    </div> 
+</div>  
+        
+<div class="pg-orgchart">
+    <div class="org-chart">
+		<ul>
+            <li>
+                {% for post in rposts %}
+                <div class="user">
+                    <p>Post</p>
+                    <a href="{{url_for('main.relation2', id=post.id)}}">
+                        <div class="name"><p>{{ post.title }}</p></div>
+                    </a>
+                    <div class="role"></div>
+                    <a class="manager" href="{{url_for('main.relation1', id=post.author.id)}}">{{post.author.username}}</a>
+                </div>
+                {% endfor %}
+            </li>    
+        </ul>
+    </div> 
+</div>   
+        
+
+<div class="pg-orgchart">
+    <div class="org-chart">
+		<ul>
+            <li>
+                <div class="user">
+                    
+                    <a href="{{url_for('main.relation1', id=post.author.id)}}">
+                        <div class="name">{{post.category}}</div>
+                    </a>
+                    <div class="role">Category</div>
+                    
+                </div>
+            </li>    
+        </ul>
+    </div> 
+</div>  
+
+            
